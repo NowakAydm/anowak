@@ -1,2 +1,2 @@
 # anowak
-Repo pour tous les projets relatifs à l'école 42
+This folder contains all the projects relative to school 42.
