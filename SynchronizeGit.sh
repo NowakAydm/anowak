@@ -1,3 +1,3 @@
-git add ~/projects/*
+git add -A ~/projects/*
 git commit -m "`date`"
 git push
