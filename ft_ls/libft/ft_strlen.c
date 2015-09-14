@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_puiss10.c                                       :+:      :+:    :+:   */
+/*   ft_strlen.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/04 19:05:26 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/15 17:05:00 by anowak           ###   ########.fr       */
+/*   Created: 2014/11/05 13:27:43 by anowak            #+#    #+#             */
+/*   Updated: 2014/12/09 14:06:44 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_puiss10(int n)
+size_t	ft_strlen(char const *s)
 {
-	if (n == 0)
-		return (1);
-	if (n == 1)
-		return (10);
-	else
-		return (10 * ft_puiss10(n - 1));
+	size_t	l;
+
+	l = 0;
+	if (s)
+		while (*s)
+		{
+			l++;
+			s++;
+		}
+	return (l);
 }

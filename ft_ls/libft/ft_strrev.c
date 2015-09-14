@@ -1,31 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstdel.c                                        :+:      :+:    :+:   */
+/*   ft_strrev.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/15 15:59:21 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/19 17:08:17 by anowak           ###   ########.fr       */
+/*   Created: 2014/11/14 15:12:18 by anowak            #+#    #+#             */
+/*   Updated: 2014/12/08 01:30:15 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdio.h>
 
-void	ft_lstdel(t_list **alst, void (*del)(void *, size_t))
+char	*ft_strrev(char *s)
 {
-	t_list	*tmp;
+	int		i;
+	int		j;
+	char	tmp;
 
-	if (alst)
+	if (s)
 	{
-		while ((*alst)->next)
+		i = 0;
+		j = ft_strlen(s) - 1;
+		while (i < j)
 		{
-			tmp = *alst;
-			*alst = (*alst)->next;
-			del(tmp, tmp->content_size);
+			tmp = s[i];
+			s[i] = s[j];
+			s[j] = tmp;
+			i++;
+			j--;
 		}
-		del(*alst, (*alst)->content_size);
-		free(*alst);
-		*alst = NULL;
 	}
+	return (s);
 }

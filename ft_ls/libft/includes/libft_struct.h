@@ -1,21 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstdelcontent.c                                 :+:      :+:    :+:   */
+/*   libft_struct.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/19 17:05:39 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/19 17:11:42 by anowak           ###   ########.fr       */
+/*   Created: 2014/12/03 19:45:00 by anowak            #+#    #+#             */
+/*   Updated: 2014/12/03 19:46:01 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef LIBFT_STRUCT_H
+# define LIBFT_STRUCT_H
 
-void	ft_lstdelcontent(void *content, size_t content_size)
+typedef struct		s_list
 {
-	if (content)
-		free(content);
-	if (content_size)
-		content_size = 0;
-}
+	void			*content;
+	size_t			content_size;
+	struct s_list	*next;
+}					t_list;
+
+typedef struct		s_btree
+{
+	struct s_btree	*left;
+	struct s_btree	*right;
+	void			*item;
+}					t_btree;
+
+#endif

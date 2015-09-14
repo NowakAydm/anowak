@@ -1,26 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   ft_lstdel.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/05 13:27:43 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/05 13:30:56 by anowak           ###   ########.fr       */
+/*   Created: 2014/11/15 15:59:21 by anowak            #+#    #+#             */
+/*   Updated: 2014/11/27 03:16:40 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlen(char const *s)
+void	ft_lstdel(t_list **alst, void (*del)(void *, size_t))
 {
-	size_t	l;
+	t_list	*tmp;
 
-	l = 0;
-	while (*s)
+	if (alst)
 	{
-		l++;
-		s++;
+		while ((*alst)->next)
+		{
+			tmp = *alst;
+			*alst = (*alst)->next;
+			ft_lstdelone(&tmp, del);
+		}
+		ft_lstdelone(&*alst, del);
+		free(*alst);
+		*alst = NULL;
 	}
-	return (l);
 }

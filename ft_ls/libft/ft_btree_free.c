@@ -1,25 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_btree_free.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/15 19:03:44 by anowak            #+#    #+#             */
-/*   Updated: 2015/04/20 16:09:54 by anowak           ###   ########.fr       */
+/*   Created: 2015/01/06 19:46:22 by anowak            #+#    #+#             */
+/*   Updated: 2015/01/06 19:53:20 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "libft.h"
 
-# include <sys/types.h>
-# include <sys/uio.h>
-# include <unistd.h>
-# include "libft/includes/libft.h"
-
-# define BUFF_SIZE 40
-
-int		get_next_line(int const fd, char **line);
-
-#endif
+void	ft_btree_free(t_btree *root)
+{
+	if (!root)
+		return ;
+	if (root->left)
+		ft_btree_free(root->left);
+	if (root->right)
+		ft_btree_free(root->right);
+	free(root->item);
+	free(root);
+}

@@ -1,21 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putnbr.c                                        :+:      :+:    :+:   */
+/*   ft_abs.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/09/01 15:39:00 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/14 20:03:19 by anowak           ###   ########.fr       */
+/*   Created: 2015/02/16 01:23:45 by anowak            #+#    #+#             */
+/*   Updated: 2015/03/16 04:32:15 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void ft_putnbr(int nb)
+unsigned long long ft_abs(long long n)
 {
-	char *str;
-
-	str = ft_itoa(nb);
-	write(1, str, ft_strlen(str));
+	return ((n > 0 ? n : -n));
 }

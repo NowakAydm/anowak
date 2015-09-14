@@ -1,28 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstaddend.c                                     :+:      :+:    :+:   */
+/*   ft_btree_suffix.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/15 16:52:49 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/15 17:35:33 by anowak           ###   ########.fr       */
+/*   Created: 2014/12/01 16:13:55 by anowak            #+#    #+#             */
+/*   Updated: 2014/12/01 16:14:18 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_lstaddend(t_list **alst, t_list *new)
+void	ft_btree_suffix(t_btree *root, void (*applyf)(void *))
 {
-	t_list	*tmp;
-
-	if (new && *alst)
+	if (root)
 	{
-		tmp = *alst;
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new;
+		if (root->left != 0)
+			ft_btree_suffix(root->left, *applyf);
+		if (root->right != 0)
+			ft_btree_suffix(root->right, *applyf);
+		applyf(root->item);
 	}
-	if (new && !*alst)
-		*alst = new;
 }

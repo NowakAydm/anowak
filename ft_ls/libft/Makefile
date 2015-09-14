@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 13:45:00 by anowak            #+#    #+#              #
-#    Updated: 2015/04/20 16:14:13 by anowak           ###   ########.fr        #
+#    Updated: 2015/03/16 04:25:09 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -32,7 +32,9 @@ SRC =		ft_memset.c		\
 			ft_strnstr.c	\
 			ft_strcmp.c		\
 			ft_strncmp.c	\
+			ft_abs.c		\
 			ft_atoi.c		\
+			ft_atod.c		\
 			ft_isalpha.c	\
 			ft_isdigit.c	\
 			ft_isalnum.c	\
@@ -56,10 +58,12 @@ SRC =		ft_memset.c		\
 			ft_strtrim.c	\
 			ft_strsplit.c	\
 			ft_itoa.c		\
+			ft_ltoa.c	\
 			ft_putchar.c	\
 			ft_putstr.c		\
 			ft_putendl.c	\
 			ft_putnbr.c		\
+			ft_putnbrendl.c	\
 			ft_putchar_fd.c	\
 			ft_putstr_fd.c	\
 			ft_putendl_fd.c	\
@@ -80,31 +84,38 @@ SRC =		ft_memset.c		\
 			ft_lstaddend.c	\
 			ft_lstsplit.c	\
 			ft_putlst_str.c	\
-			ft_lstdelcontent.c
+			ft_lstdelcontent.c	\
+			ft_lsttostr.c	\
+			ft_btree_new.c	\
+			ft_btree_prefix.c	\
+			ft_btree_infix.c	\
+			ft_btree_rev_infix.c	\
+			ft_btree_suffix.c	\
+			ft_btree_insert.c
+
 OBJ =		$(SRC:.c=.o)
 
 all : $(NAME)
 
 $(NAME) :
-	@echo "Compilation des fichiers .o"
+	@echo "\033[31m/==================================\\"
+	@echo "\033[31m|        \033[33mCreation of libft         \033[31m|"
+	@echo "\033[31m\\==================================/"
+	@echo "\033[33m  - Compilation of source files\033[0m"
 	@gcc -c -I includes/ $(FLAGS) $(SRC)
-	@echo "Creation de libft.a"
+	@echo "\033[33m  - Creation of libft.a\033[0m"
 	@ar rc $(NAME) $(OBJ)
-	ranlib $(NAME)
+	@ranlib $(NAME)
+	@echo "\033[31mx============= \033[32mDONE ! \033[31m=============x\033[0m"
+	@echo ""
+	@echo ""
 
 clean :
-	@echo "Suppression des fichiers .o"
+	@echo "\033[34m  - Deleting libft's object files\033[0m"
 	@rm -f $(OBJ)
 
 fclean : clean
-	@echo "Suppression de libft.a"
-	@rm -f libft.a
+	@echo "\033[34m  - Deleting libft.a\033[0m"
+	@rm -f $(NAME)
 
 re : fclean all
-
-test :
-	@echo "Compilation du moulinator ..."
-	@gcc -o Test-Moulinator mainmoulinator.c
-	@gcc -fPIC -Wall -Werror -Wextra -shared -o libft.so $(OBJ)
-	@./Test-Moulinator
-	@rm libft.so

@@ -1,23 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strclr.c                                        :+:      :+:    :+:   */
+/*   ft_btree_rev_infix.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/11/12 16:11:30 by anowak            #+#    #+#             */
-/*   Updated: 2015/04/20 16:58:37 by anowak           ###   ########.fr       */
+/*   Created: 2014/12/07 19:43:48 by anowak            #+#    #+#             */
+/*   Updated: 2014/12/07 19:44:01 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_strclr(char *s)
+void	ft_btree_rev_infix(t_btree *root, void (*applyf)(void *))
 {
-	if (s)
-		while (*s != 0)
-		{
-			*s = 0;
-			s++;
-		}
+	if (root)
+	{
+		if (root->right)
+			ft_btree_rev_infix(root->right, applyf);
+		applyf(root->item);
+		if (root->left)
+			ft_btree_rev_infix(root->left, applyf);
+	}
 }
