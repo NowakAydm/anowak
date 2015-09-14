@@ -1,0 +1,10 @@
+BUILTIN(1)                BSD General Commands Manual               BUILTIN(1)
+
+NNAAMMEE
+     bbuuiillttiinn, !!, %%, .., ::, @@, {{, }}, aalliiaass, aalllloocc, bbgg, bbiinndd, bbiinnddkkeeyy, bbrreeaakk,
+     bbrreeaakkssww, bbuuiillttiinnss, ccaassee, ccdd, cchhddiirr, ccoommmmaanndd, ccoommpplleettee, ccoonnttiinnuuee, ddeeffaauulltt,
+     ddiirrss, ddoo, ddoonnee, eecchhoo, eecchhoottcc, eelliiff, eellssee, eenndd, eennddiiff, eennddssww, eessaacc, eevvaall,
+     eexxeecc, eexxiitt, eexxppoorrtt, ffaallssee, ffcc, ffgg, ffiilleetteesstt, ffii, ffoorr, ffoorreeaacchh, ggeettooppttss,
+     gglloobb, ggoottoo, hhaasshh, hhaasshhssttaatt, hhiissttoorryy, hhuupp, iiff, jjoobbiidd, jjoobbss, kkiillll, lliimmiitt,
+     llooccaall, lloogg, llooggiinn, llooggoouutt, llss--FF, nniiccee, nnoohhuupp, nnoottiiffyy, oonniinnttrr, ppooppdd,
+     pprriinntteennvv, ppuusshhdd, ppwwdd, rreeaadd, rreeaaddoonnllyy, rreehhaasshh, rreeppeeaatt, rreettuurrnn, sscchheedd, sseett,
