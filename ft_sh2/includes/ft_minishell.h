@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/28 19:48:39 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/15 12:58:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup);
 */
 char	*recover_previous_line(char **line, char **tmp);
 char	*get_command_line(void);
+t_list	*add_to_command_list(t_list *list, t_list *args, int pipe);
 t_list	*process_command_line(char *line, char ***env_dup, int ret);
 int		execute_command_line(t_ftsh *sh, char ***env_dup);
 

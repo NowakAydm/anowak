@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/25 16:47:15 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/15 13:00:26 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ char	*get_command_line(void)
 	return ((write(1, "\n", 1) ? NULL : NULL));
 }
 
-t_list	*add_to_command_list(t_list *list, t_list *args)
+t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 {
 	t_list	*new;
 
@@ -70,6 +70,10 @@ t_list	*add_to_command_list(t_list *list, t_list *args)
 		return (NULL);
 	((t_cmd*)new->content)->argv = ft_lsttotab(&args);
 	((t_cmd*)new->content)->argc = ft_tablen(((t_cmd*)new->content)->argv);
+	((t_cmd*)new->content)->fd_in = 0;
+	((t_cmd*)new->content)->fd_out = 1;
+	((t_cmd*)new->content)->pipeout = pipe;
+	((t_cmd*)new->content)->pipein = 0;
 	ft_lstaddend(&list, new);
 	return (list);
 }
@@ -91,16 +95,23 @@ t_list	*process_command_line(char *line, char ***env_dup, int ret)
 		if (ft_strcmp(cur->content, ";") == 0)
 		{
 			if (ft_lstlen(&new_cmd))
-				if (!(cmds = add_to_command_list(cmds, new_cmd)))
+				if (!(cmds = add_to_command_list(cmds, new_cmd, 0)))
 					return (NULL);
 			ft_lstdel(&new_cmd, ft_lstdelcontent);
+		}
+		else if (ft_strcmp(cur->content, "|") == 0)
+		{
+			if (ft_lstlen(&new_cmd))
+				if (!(cmds = add_to_command_list(cmds, new_cmd, 1)))
+					return (NULL);
+			ft_lstdel(&new_cmd, ft_lstdelcontent);			
 		}
 		else
 			ft_lstaddend(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
 		cur = cur->next;
 	}
 	if (ft_lstlen(&new_cmd))
-		if (!(cmds = add_to_command_list(cmds, new_cmd)))
+		if (!(cmds = add_to_command_list(cmds, new_cmd, 0)))
 			return (NULL);
 	ft_lstdel(&new_cmd, ft_lstdelcontent);
 	ft_lstdel(&args, ft_lstdelcontent);
@@ -112,14 +123,20 @@ int		execute_command_line(t_ftsh *sh, char ***env_dup)
 	t_list	*list;
 	t_list	*tmp;
 	int		ret;
+	int		pipein;
 
 	ret = 0;
 	list = NULL;
 	if (!(list = process_command_line(sh->line, env_dup, sh->ret)))
 		return (1);
+	pipein = 0;
 	while (list)
 	{
+		((t_cmd*)list->content)->pipein = pipein;
 		ret = execute_command(list->content, sh, env_dup);
+		pipein = 0;
+		if (((t_cmd*)list->content)->pipeout != 0)
+			pipein = ((t_cmd*)list->content)->pipeout;
 		tmp = list->next;
 		ft_lstdelone(&list, ft_lstdelcontent);
 		list = tmp;

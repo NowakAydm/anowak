@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/25 17:24:35 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/15 11:22:55 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ int		argument_is_in_quotes(char *line, t_list **list, int x)
 		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
 		free(str);
 	}
+// TODO: corriger le comportement pour "ls ''-a" et "ls '' -a"
 	return (x + y);
 }
 

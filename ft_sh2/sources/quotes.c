@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 19:42:06 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/25 17:13:48 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/15 11:05:03 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int		check_pipe(char *line)
 	x = -1;
 	ret = 0;
 	str = NULL;
-	if ((str = ft_strrchr(line, '|')))
+	if ((str = ft_strchr(line, '|')))
 	{
 		while (str[++x])
 		{
