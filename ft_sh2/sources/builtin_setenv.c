@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:30:35 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 18:13:00 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:39:23 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@ static char	*change_into_number(char *av)
 		{
 			free(var_name);
 			free(av);
-			return (ft_strdup("SHLVL=0"));
+			ft_putendl_fd("Error : SHLVL must be a number", 2);
+			return (NULL);
 		}
 	}
 	free(var_name);
@@ -88,9 +89,9 @@ int			builtin_setenv(char **av, char ***env)
 	}
 	while (av[++x])
 		if (ft_strchr(av[x], '=') && *(ft_strchr(av[x], '=') + 1)
+			&& (av[x] = change_into_number(av[x]))
 			&& av[x][0] && av[x][0] != '=')
 		{
-			av[x] = change_into_number(av[x]);
 			if ((ret = check_if_in_env(av[x], *env)) >= 0)
 			{
 				free((*env)[ret]);
