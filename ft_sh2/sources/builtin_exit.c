@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 18:14:26 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/16 18:24:19 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:31:41 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	builtin_exit(int ac, char **av)
 {
 	if (ac < 2)
 	{
+		ft_putendl("Exiting ft_minishell2 ... See you later .)");
 		exit(0);
 	}
 	if (ac == 2)

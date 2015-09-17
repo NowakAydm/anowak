@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 16:24:22 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:14:36 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,6 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	pid_t	child;
 	int		pipe_des[2];
 	
-	printf("%d>>>> PIPING UP SHITZ", getpid());
 	if (pipe(pipe_des))
 		return (-1);
 	child = fork();

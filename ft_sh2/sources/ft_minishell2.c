@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 17:01:46 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/28 18:55:25 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:30:24 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,24 @@ char	**extract_path_directories(char **envp)
 	return (ft_strsplit((ft_strchr(envp[x], '=') + 1), ':'));
 }
 
+void	increment_shlvl(char ***env)
+{
+	int		n;
+	char	**str;
+	
+	if (get_in_env(*env, "SHLVL"))
+	{
+		n = ft_atoi(get_in_env(*env, "SHLVL"));
+		str = ft_memalloc(sizeof(char*) * 3);
+		str[0] = ft_strdup("setenv");
+		str[1] = ft_strnew(20);
+		str[1] = ft_strcat(str[1], "SHLVL=");
+		str[1] = ft_strcat(str[1], ft_itoa(++n));
+		builtin_setenv(str, env);
+		ft_tabfree(str);
+	}
+}
+
 t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 {
 	t_ftsh	*sh;
@@ -48,6 +66,7 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 		if (!(sh->prompt))
 			return (NULL);
 		sh->env_dup = ft_tabdup(envp);
+		increment_shlvl(&(sh->env_dup));
 		sh->line = NULL;
 		change_env_pwd(&(sh->env_dup));
 		if (sh->env_dup)

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:30:35 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/16 18:50:41 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:13:00 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,26 @@ int			check_if_in_env(char *av, char **env)
 		x++;
 	}
 	return (-1);
+}
+
+static char	*change_into_number(char *av)
+{
+	char	*var_name;
+	int		number;
+
+	if (!(var_name = ft_strcdup(av, '=')))
+		return (av);
+	if (!(ft_strcmp(var_name, "SHLVL")))
+	{
+		if (!(number = ft_atoi(ft_strchr(av, '=') + 1)))
+		{
+			free(var_name);
+			free(av);
+			return (ft_strdup("SHLVL=0"));
+		}
+	}
+	free(var_name);
+	return (av);
 }
 
 static int	add_variable_to_env(char *av, char ***env)
@@ -67,8 +87,10 @@ int			builtin_setenv(char **av, char ***env)
 		return (1);
 	}
 	while (av[++x])
-		if (ft_strchr(av[x], '=') && av[x][0] && av[x][0] != '=')
+		if (ft_strchr(av[x], '=') && *(ft_strchr(av[x], '=') + 1)
+			&& av[x][0] && av[x][0] != '=')
 		{
+			av[x] = change_into_number(av[x]);
 			if ((ret = check_if_in_env(av[x], *env)) >= 0)
 			{
 				free((*env)[ret]);
