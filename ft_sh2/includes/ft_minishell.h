@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 14:30:19 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 16:03:12 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	catch_signals(void);
 int		check_permissions(char *path);
 int		find_path_to_command(t_cmd *new, char **path_dir);
 void	print_ret_message(int status, char *cmd);
-void	do_the_fork_thing(t_cmd *new, char ***env_dup);
+void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup);
 int		process_command(t_cmd *new, t_ftsh *sh);
 int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup);
 

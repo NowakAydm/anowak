@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 14:30:29 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 16:24:22 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,46 +96,43 @@ void	print_ret_message(int status, char *cmd)
 	}
 }
 
-int		make_it_pipe(t_cmd *new, t_ftsh *sh, char ***env_dup)
+int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
-	int	pipe_fd[2];
-	int	child;
-
-	printf("%d>>>> MAKING IT PIPE\n", getpid());
-	if (pipe(pipe_fd))
+	pid_t	child;
+	int		pipe_des[2];
+	
+	printf("%d>>>> PIPING UP SHITZ", getpid());
+	if (pipe(pipe_des))
 		return (-1);
 	child = fork();
 	if (child == -1)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
+		close(pipe_des[0]);
+		close(pipe_des[1]);
 		return (-1);
 	}
 	else if (child == 0)
 	{
 // PROCESSUS FILS
-		printf("%d---- IM IN THE PIPED CHILD - %s\n", getpid(), ((t_cmd*)new->piped_to)->argv[0]);
-
-		((t_cmd*)new->piped_to)->fd_out = pipe_fd[1];
-//		printf("close returns %d\n", close(pipe_fd[0]));
-		execute_command((new->piped_to), sh, env_dup);
+		dup2(pipe_des[1], 1);
+		close(pipe_des[0]);
+		if (process_command(cmd->piped_to, sh))
+			return (-1);
+		if ((cmd->piped_to)->piped_to)
+			pipe_it_up(cmd->piped_to, sh, env_dup);
+		execve((cmd->piped_to)->path, (cmd->piped_to)->argv, *env_dup);
+		return (0);
 	}
-	else
-	{
+	
 // PROCESSUS PARENT
-		printf("%d---- iM THE PIPED FAZER - '%s'\n", getpid(), new->argv[0]);
-		printf("%d---- i wait ...\n", getpid());
-		wait4(0, NULL, 0, 0);
-		printf("dup2 returns %d\n", dup2(pipe_fd[0], 0));
-		printf("close(0) returns %d\n", close(0));	
-		printf("close(pipeout) returns %d\n", close(pipe_fd[1]));
-		printf("%d---- PIPED FATHER EXECUTES - '%s'\n", getpid(), new->argv[0]);
-		execve(new->path, new->argv, *env_dup);
-	}
+	dup2(pipe_des[0], 0);
+	close(pipe_des[1]);
+	wait(NULL);
+	execve(cmd->path, cmd->argv, *env_dup);
 	return (0);
 }
 
-void	do_the_fork_thing(t_cmd *new, char ***env_dup)
+void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
 	int		ret;
 
@@ -148,7 +145,10 @@ void	do_the_fork_thing(t_cmd *new, char ***env_dup)
 	else if (new->pid == 0)
 	{
 // PROCESSUS FILS
-		ret = execve(new->path, new->argv, *env_dup);
+		if (new->piped_to)
+			ret = pipe_it_up(new, sh, env_dup);
+		else
+			ret = execve(new->path, new->argv, *env_dup);
 		if (ret == -1)
 		{
 			ft_putendl_fd("Error : Could'nt execute command", 2);
@@ -200,7 +200,6 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
 	int		ret;
 
-	printf("%d---- EXECUTING COMMAND '%s'\n", getpid(), new->argv[0]);
 	if ((ret = process_command(new, sh)))
 	{
 		free(new->path);
@@ -212,7 +211,7 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		if (new->is_builtin)
 			ret = execute_builtin(new, env_dup) - 1;
 		else
-			do_the_fork_thing(new, env_dup);
+			do_the_fork_thing(new, sh, env_dup);
 	}
 
 	if (new->path)

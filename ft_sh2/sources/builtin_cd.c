@@ -6,18 +6,20 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:27:32 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/28 18:13:42 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 15:35:02 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-static int	change_env_oldpwd(char ***envp, char *pwd)
+static int	change_env_oldpwd(char ***envp)
 {
 	int		x;
 	char	*oldpwd;
+	char	*pwd;
 
 	x = 0;
+	pwd = get_in_env(*envp, "PWD");
 	if (!(oldpwd = ft_strnew(ft_strlen(pwd) + 8)))
 		return (-1);
 	oldpwd = ft_strncat(oldpwd, "OLDPWD=", 7);
@@ -90,7 +92,6 @@ static char	*get_destination(char **av, char ***envp)
 int			builtin_cd(char **av, char ***envp)
 {
 	char	*path;
-	char	*cwd;
 
 	path = get_destination(av, envp);
 	if (path)
@@ -103,10 +104,8 @@ int			builtin_cd(char **av, char ***envp)
 		}
 		else
 		{
-			cwd = getcwd(NULL, 1);
-			change_env_oldpwd(envp, cwd);
+			change_env_oldpwd(envp);
 			change_env_pwd(envp);
-			free(cwd);
 		}
 	}
 	else
