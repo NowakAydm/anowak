@@ -6,35 +6,36 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:50:55 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/15 12:59:41 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 14:19:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STRUCTS_H
 # define STRUCTS_H
 
-typedef struct	s_ftsh
+typedef struct		s_ftsh
 {
-	char	*prompt;
-	char	**path_dir;
-	char	**env_dup;
-	char	*line;
-	int		argc;
-	char	**argv;
-	int		ret;
-}				t_ftsh;
+	char			*prompt;
+	char			**path_dir;
+	char			**env_dup;
+	char			*line;
+	int				argc;
+	char			**argv;
+	int				ret;
+}					t_ftsh;
 
-typedef struct	s_cmd
+typedef struct		s_cmd
 {
-	char		*path;
-	int			argc;
-	char		**argv;
-	pid_t		pid;
-	int			status;
-	int			pipeout;
-	int			pipein;
-	int			fd_in;
-	int			fd_out;
-}				t_cmd;
+	int				is_builtin;
+	char			*path;
+	int				argc;
+	char			**argv;
+	pid_t			pid;
+	int				status;
+	int				pipe;
+	struct s_cmd	*piped_to;
+	int				fd_in;
+	int				fd_out;
+}					t_cmd;
 
 #endif

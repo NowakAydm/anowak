@@ -20,3 +20,4 @@ export MAIL
 alias l="ls -laGh"
 alias e="emacs"
 alias r="rm -v *~ ; rm -v .*~"
+alias synchronize="~/projects/SynchronizeGit.sh"

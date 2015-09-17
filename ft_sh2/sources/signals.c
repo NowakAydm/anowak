@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 17:31:51 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/16 19:24:40 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 11:21:25 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ void		process_terminate_in_process(int signum)
 	(void)signum;
 	return ;
 }
+
+// Add function to display 'malloc failed' error message
 
 void		process_buserr(int signum)
 {

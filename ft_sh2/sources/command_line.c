@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/15 13:00:26 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 14:19:44 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,10 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 		return (NULL);
 	((t_cmd*)new->content)->argv = ft_lsttotab(&args);
 	((t_cmd*)new->content)->argc = ft_tablen(((t_cmd*)new->content)->argv);
+	((t_cmd*)new->content)->is_builtin = 0;
 	((t_cmd*)new->content)->fd_in = 0;
 	((t_cmd*)new->content)->fd_out = 1;
-	((t_cmd*)new->content)->pipeout = pipe;
-	((t_cmd*)new->content)->pipein = 0;
+	((t_cmd*)new->content)->pipe = pipe;
 	ft_lstaddend(&list, new);
 	return (list);
 }
@@ -123,20 +123,20 @@ int		execute_command_line(t_ftsh *sh, char ***env_dup)
 	t_list	*list;
 	t_list	*tmp;
 	int		ret;
-	int		pipein;
 
 	ret = 0;
 	list = NULL;
 	if (!(list = process_command_line(sh->line, env_dup, sh->ret)))
 		return (1);
-	pipein = 0;
 	while (list)
 	{
-		((t_cmd*)list->content)->pipein = pipein;
+		while (((t_cmd*)list->content)->pipe)
+		{
+			tmp = list->next;
+			((t_cmd*)tmp->content)->piped_to = list->content;
+			list = tmp;
+		}
 		ret = execute_command(list->content, sh, env_dup);
-		pipein = 0;
-		if (((t_cmd*)list->content)->pipeout != 0)
-			pipein = ((t_cmd*)list->content)->pipeout;
 		tmp = list->next;
 		ft_lstdelone(&list, ft_lstdelcontent);
 		list = tmp;

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/15 13:03:55 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 14:30:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,28 +91,47 @@ void	print_ret_message(int status, char *cmd)
 			ft_putendl_fd("unknown system call", 2);
 		else if (status == SIGILL)
 			ft_putendl_fd("illegal instruction", 2);
+		else
+			ft_putendl_fd("something bad happened", 2);
 	}
 }
 
-int		make_the_pipe(t_cmd *new)
+int		make_it_pipe(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
-	int fildes[2];
+	int	pipe_fd[2];
+	int	child;
 
-	ft_putendl("CREATING PIPE");
-	if (pipe(fildes))
-		return (1);
-	if ((new->fd_out = dup2(1, fildes[1])) == -1)
-		ft_putendl_fd("Error : dup returned -1", 2);
-	new->pipeout = fildes[0];
-	ft_putstr("DUPLICATED OUT FD = ");
-	ft_putnbr(new->fd_out);
-	ft_putendl("");
-	ft_putstr("PIPE OUT FD = ");
-	ft_putnbr(new->pipeout);
-	ft_putendl("");
+	printf("%d>>>> MAKING IT PIPE\n", getpid());
+	if (pipe(pipe_fd))
+		return (-1);
+	child = fork();
+	if (child == -1)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		return (-1);
+	}
+	else if (child == 0)
+	{
+// PROCESSUS FILS
+		printf("%d---- IM IN THE PIPED CHILD - %s\n", getpid(), ((t_cmd*)new->piped_to)->argv[0]);
 
-//	if ((ret = close(1)) == -1)
-//		ft_putendl_fd("Error : close(1) returned -1", 2);
+		((t_cmd*)new->piped_to)->fd_out = pipe_fd[1];
+//		printf("close returns %d\n", close(pipe_fd[0]));
+		execute_command((new->piped_to), sh, env_dup);
+	}
+	else
+	{
+// PROCESSUS PARENT
+		printf("%d---- iM THE PIPED FAZER - '%s'\n", getpid(), new->argv[0]);
+		printf("%d---- i wait ...\n", getpid());
+		wait4(0, NULL, 0, 0);
+		printf("dup2 returns %d\n", dup2(pipe_fd[0], 0));
+		printf("close(0) returns %d\n", close(0));	
+		printf("close(pipeout) returns %d\n", close(pipe_fd[1]));
+		printf("%d---- PIPED FATHER EXECUTES - '%s'\n", getpid(), new->argv[0]);
+		execve(new->path, new->argv, *env_dup);
+	}
 	return (0);
 }
 
@@ -123,49 +142,39 @@ void	do_the_fork_thing(t_cmd *new, char ***env_dup)
 	ret = 0;
 	signal(SIGINT, SIG_DFL);
 	signal(SIGINT, process_terminate_in_process);
-	if ((new->pid = fork()) > 0)
+	new->pid = fork();
+	if (new->pid == -1)
+		ft_putendl_fd("Error : Could'nt fork", 2);
+	else if (new->pid == 0)
 	{
+// PROCESSUS FILS
+		ret = execve(new->path, new->argv, *env_dup);
+		if (ret == -1)
+		{
+			ft_putendl_fd("Error : Could'nt execute command", 2);
+			print_ret_message(new->status, new->argv[0]);
+		}
+	}
+	else
+	{
+// PROCESSUS PARENT
 		if ((ret = wait(&(new->status))) == -1)
 			ft_putendl_fd("Error : Wait returned -1", 2);
 		print_ret_message(new->status, new->argv[0]);
 	}
-	else if (new->pid == 0)
-	{
-		if (new->pipeout)
-			if (make_the_pipe(new))
-			{
-				ft_putendl_fd("Error : could'nt pipe", 2);
-				return ;
-			}
-		if (new->pipein)
-		{
-			if ((new->pipein = dup2(0, new->pipein)) == -1)
-			{
-				ft_putendl_fd("Error : dup returned -1", 2);
-				return ;
-			}
-			if ((ret = close(0)) == -1)
-				ft_putendl_fd("Error : close(0) returned -1", 2);
-		}
-		ft_putstr_fd("EXECUTING COMMAND = ", 1);
-		ft_putendl_fd(new->argv[0], 1);
-		ret = execve(new->path, new->argv, *env_dup);
-	}
-	else if (new->pid == -1)
-		ft_putendl_fd("Error : Could'nt fork", 2);
 	return ;
 }
 
-int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
+int		process_command(t_cmd *new, t_ftsh *sh)
 {
 	int		ret;
 
-	if ((ret = check_builtin(new, env_dup)))
+	if ((ret = check_builtin(new)))
 	{
-		ft_tabfree(new->argv);
-		return (ret - 1);
+		new->is_builtin = 1;
+		return (0);
 	}
-	if (!(ret = find_path_to_command(new, sh->path_dir)))
+	else if (!(ret = find_path_to_command(new, sh->path_dir)))
 	{
 		ft_putendl_fd("Error : could'nt allocate enough memory", 2);
 		ret = 12;
@@ -183,8 +192,31 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		ret = 126;
 	}
 	else
-		do_the_fork_thing(new, env_dup);
-	free(new->path);
+		return (0);
+	return (ret);
+}
+
+int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
+{
+	int		ret;
+
+	printf("%d---- EXECUTING COMMAND '%s'\n", getpid(), new->argv[0]);
+	if ((ret = process_command(new, sh)))
+	{
+		free(new->path);
+		ft_tabfree(new->argv);
+		return (ret);
+	}
+	else
+	{
+		if (new->is_builtin)
+			ret = execute_builtin(new, env_dup) - 1;
+		else
+			do_the_fork_thing(new, env_dup);
+	}
+
+	if (new->path)
+		free(new->path);
 	ft_tabfree(new->argv);
 	return (ret);
 }
