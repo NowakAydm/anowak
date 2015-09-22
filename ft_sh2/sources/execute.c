@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 18:14:36 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/22 15:15:32 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,9 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 
 	ret = 0;
 	signal(SIGINT, SIG_DFL);
-	signal(SIGINT, process_terminate_in_process);
+	signal(SIGTSTP, SIG_IGN);
+	if (signal(SIGINT, process_terminate_in_process) == SIG_ERR)
+		ft_putendl_fd("Error : can't catch signal", 2);
 	new->pid = fork();
 	if (new->pid == -1)
 		ft_putendl_fd("Error : Could'nt fork", 2);
