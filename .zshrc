@@ -10,7 +10,6 @@ if [[ -f ~/.myzshrc ]]; then
   source ~/.myzshrc
 fi
 
-ZSH_THEME="robbyrussell"
 USER=`/usr/bin/whoami`
 export USER
 GROUP=`/usr/bin/id -gn $user`
@@ -23,6 +22,9 @@ alias e="emacs"
 alias r="rm -v *~ ; rm -v .*~"
 alias synchronize="~/projects/SynchronizeGit.sh"
 
+
+if [[ -f ~/.oh-my-zsh ]]; then
+
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 
@@ -30,7 +32,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
+ZSH_THEME="clean"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -107,3 +109,5 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+fi
