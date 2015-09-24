@@ -14,10 +14,10 @@
 (setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
 
-(load "list.el")
-(load "string.el")
-(load "comments.el")
-(load "header.el")
+; (load "list.el")
+; (load "string.el")
+; (load "comments.el")
+; (load "header.el")
 
 ; Set default emacs configuration
 (set-language-environment "UTF-8")
@@ -71,3 +71,16 @@
 
 
 ;*******************************************************************************;
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(gud-gdb-command-name "gdb --annotate=1")
+ '(large-file-warning-threshold nil))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(font-lock-comment-face ((((class color) (min-colors 8) (background light)) (:foreground "red")))))
