@@ -23,7 +23,7 @@ alias r="rm -v *~ ; rm -v .*~"
 alias synchronize="~/projects/SynchronizeGit.sh"
 
 
-if [[ -d ~/.oh-my-zsh ]]; then
+if [[ -f ~/.oh-my-zsh ]]; then
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
