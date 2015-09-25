@@ -65,14 +65,23 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 {
 	t_list	*new;
 
+
 	new = ft_lstnew(NULL, sizeof(t_cmd*));
 	if (!(new->content = ft_memalloc(sizeof(t_cmd))))
 		return (NULL);
+	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
+	{
+		if (ft_strcmp(args->content, "<") == '<')
+		{
+
+		}
+//		else
+		if (!(args = args->next))
+			return (NULL);
+	}
 	((t_cmd*)new->content)->argv = ft_lsttotab(&args);
 	((t_cmd*)new->content)->argc = ft_tablen(((t_cmd*)new->content)->argv);
 	((t_cmd*)new->content)->is_builtin = 0;
-//	((t_cmd*)new->content)->fd_in = 0;
-//	((t_cmd*)new->content)->fd_out = 1;
 	((t_cmd*)new->content)->pipe = pipe;
 	ft_lstaddend(&list, new);
 	return (list);
@@ -106,6 +115,8 @@ t_list	*process_command_line(char *line, char ***env_dup, int ret)
 					return (NULL);
 			ft_lstdel(&new_cmd, ft_lstdelcontent);			
 		}
+		else if (*(char*)(cur->content) == '<' || *(char*)(cur->content) == '>')
+			ft_lstadd(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
 		else
 			ft_lstaddend(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
 		cur = cur->next;
