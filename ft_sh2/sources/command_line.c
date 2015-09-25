@@ -71,8 +71,8 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 	((t_cmd*)new->content)->argv = ft_lsttotab(&args);
 	((t_cmd*)new->content)->argc = ft_tablen(((t_cmd*)new->content)->argv);
 	((t_cmd*)new->content)->is_builtin = 0;
-	((t_cmd*)new->content)->fd_in = 0;
-	((t_cmd*)new->content)->fd_out = 1;
+//	((t_cmd*)new->content)->fd_in = 0;
+//	((t_cmd*)new->content)->fd_out = 1;
 	((t_cmd*)new->content)->pipe = pipe;
 	ft_lstaddend(&list, new);
 	return (list);

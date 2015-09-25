@@ -47,10 +47,18 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 		ft_lstaddend(list, ft_lstnew(line + x, 1));
 		x++;
 	}
+	else if (line[x] == '<' || line[x] == '>')
+	{
+		y++;
+		if (line[x + y])
+			if (line[x + y] == '<' || line[x + y] == '>')
+				y++;
+		while (ft_isspace(line[x + y]))
+			y++;
+	}
 	while (line[x + y] && !(ft_isspace(line[x + y]))
 		   && !(ft_isquote(line[x + y]))
-		   && line[x + y] != '|'
-		   && line[x + y] != ';')
+		   && !(ft_strchr("|;<>", line[x + y])))
 		if (line[x + y++] == '\\')
 			y++;
 	if (y)

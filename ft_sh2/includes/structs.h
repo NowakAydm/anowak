@@ -34,8 +34,8 @@ typedef struct		s_cmd
 	int				status;
 	int				pipe;
 	struct s_cmd	*piped_to;
-	int				fd_in;
-	int				fd_out;
+//	int				fd_in;
+//	int				fd_out;
 }					t_cmd;
 
 #endif
