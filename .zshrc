@@ -22,6 +22,7 @@ alias e="emacs"
 alias r="rm -v *~ ; rm -v .*~"
 alias synchronize="~/projects/SynchronizeGit.sh"
 
+eval "$(thefuck --alias)"
 
 if [[ -d ~/.oh-my-zsh ]]; then
 
