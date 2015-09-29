@@ -101,23 +101,36 @@ int		redirect_output(t_cmd *cmd)
 	int		fd;
 	t_list	*tmp;
 
-	fd = 0;
 	if (cmd->out || cmd->out_append)
 	{
 		while (cmd->out)
 		{
-			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC)) == -1)
-				return (-1);
-			dup2(fd, 1);
+//			printf("Duplicating out for file '%s'\n", (cmd->out)->content);
+			fd = 0;
+			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
+			{
+				ft_putstr_fd("Error : can't write output to file : ", 2);
+				ft_putendl_fd((cmd->out)->content, 2);
+			}
+//			printf("fd = %d\n", fd);
+			else
+				printf("dup2 return %d\n", dup2(fd, 1));
 			tmp = cmd->out;
 			cmd->out = (cmd->out)->next;
 			ft_lstdelone(&tmp, ft_lstdelcontent);
 		}
 		while (cmd->out_append)
 		{
-			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND)) == -1)
-				return (-1);
-			dup2(fd, 1);
+//			printf("Duplicating out for file '%s'\n", (cmd->out_append)->content);
+			fd = 0;
+			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
+			{
+				ft_putstr_fd("Error : can't write output to file : ", 2);
+				ft_putendl_fd((cmd->out)->content, 2);
+			}
+//			printf("fd = %d\n", fd);
+			else
+				printf("dup2 return %d\n", dup2(fd, 1));
 			tmp = cmd->out_append;
 			cmd->out_append = (cmd->out_append)->next;
 			ft_lstdelone(&tmp, ft_lstdelcontent);

@@ -65,6 +65,7 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 {
 	t_list	*new;
 	int		x;
+	char	*file;
 
 	new = ft_lstnew(NULL, sizeof(t_cmd*));
 	if (!(new->content = ft_memalloc(sizeof(t_cmd))))
@@ -73,28 +74,33 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
 	{
 		x = 1;
+		file = (char*)(args->content);
 //		if (ft_strcmp(args->content, "<") == '<')
 //		TO DO : HEREDOC
-		if (*(char*)(args->content) == '<')
+		if (*file == '<')
 		{
 			if ((char*)((t_cmd*)new->content)->input_file)
 				free((char*)((t_cmd*)new->content)->input_file);
-			while (ft_isspace((char)(args->content + x)))
+			while (ft_isspace(file[x]))
 				x++;
-			((t_cmd*)new->content)->input_file = ft_strdup(args->content + x);
+			((t_cmd*)new->content)->input_file = ft_strdup(file + x);
 		}
-		else if (ft_strcmp(args->content, ">") == '>')
+		else if (ft_strcmp(file, ">") == '>')
 		{
 			x++;
-			while (ft_isspace((char)(args->content + x)))
+			while (ft_isspace(file[x]))
 				x++;
-			ft_lstaddend(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(args->content + x)), ft_strlen((char*)(args->content + x))));
+			printf("Found a >> redirection to %s\n", file + x);
+			if (file[x])
+				ft_lstaddend(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
 		}
-		else if (*(char*)(args->content) == '>')
+		else if (*file == '>')
 		{
-			while (ft_isspace((char)(args->content + x)))
+			while (ft_isspace(file[x]))
 				x++;
-			ft_lstaddend(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(args->content + x)), ft_strlen((char*)(args->content + x))));
+			printf("Found a > redirection to %s\n", file + x);
+			if (file[x])
+				ft_lstaddend(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
 		}
 
 		if (!(args = args->next))
