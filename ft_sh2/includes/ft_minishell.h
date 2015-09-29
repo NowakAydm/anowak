@@ -22,6 +22,7 @@
 # include <sys/stat.h>
 # include <signal.h>
 # include <unistd.h>
+# include <fcntl.h>
 
 # include "../libft/includes/libft.h"
 # include "structs.h"

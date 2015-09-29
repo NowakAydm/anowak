@@ -34,6 +34,9 @@ typedef struct		s_cmd
 	int				status;
 	int				pipe;
 	struct s_cmd	*piped_to;
+	char			*input_file;
+	t_list			*out;
+	t_list			*out_append;
 //	int				fd_in;
 //	int				fd_out;
 }					t_cmd;

@@ -96,6 +96,37 @@ void	print_ret_message(int status, char *cmd)
 	}
 }
 
+int		redirect_output(t_cmd *cmd)
+{
+	int		fd;
+	t_list	*tmp;
+
+	fd = 0;
+	if (cmd->out || cmd->out_append)
+	{
+		while (cmd->out)
+		{
+			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC)) == -1)
+				return (-1);
+			dup2(fd, 1);
+			tmp = cmd->out;
+			cmd->out = (cmd->out)->next;
+			ft_lstdelone(&tmp, ft_lstdelcontent);
+		}
+		while (cmd->out_append)
+		{
+			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND)) == -1)
+				return (-1);
+			dup2(fd, 1);
+			tmp = cmd->out_append;
+			cmd->out_append = (cmd->out_append)->next;
+			ft_lstdelone(&tmp, ft_lstdelcontent);
+		}
+//		close(1);
+	}
+	return (0);
+}
+
 int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
@@ -119,6 +150,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 			return (-1);
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
+		redirect_output(cmd->piped_to);
 		execve((cmd->piped_to)->path, (cmd->piped_to)->argv, *env_dup);
 		return (0);
 	}
@@ -127,6 +159,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	dup2(pipe_des[0], 0);
 	close(pipe_des[1]);
 	wait(NULL);
+	redirect_output(cmd);
 	execve(cmd->path, cmd->argv, *env_dup);
 	return (0);
 }
@@ -149,7 +182,10 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		if (new->piped_to)
 			ret = pipe_it_up(new, sh, env_dup);
 		else
+		{
+			redirect_output(new);
 			ret = execve(new->path, new->argv, *env_dup);
+		}
 		if (ret == -1)
 		{
 			ft_putendl_fd("Error : Could'nt execute command", 2);
@@ -170,6 +206,7 @@ int		process_command(t_cmd *new, t_ftsh *sh)
 {
 	int		ret;
 
+	ret = 0;
 	if ((ret = check_builtin(new)))
 	{
 		new->is_builtin = 1;
@@ -209,6 +246,7 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
 	}
 	else
 	{
+//	TODO - REDIRECTIONS SUR LES BUILTINS
 		if (new->is_builtin)
 			ret = execute_builtin(new, env_dup) - 1;
 		else

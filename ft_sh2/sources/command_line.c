@@ -64,18 +64,39 @@ char	*get_command_line(void)
 t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 {
 	t_list	*new;
-
+	int		x;
 
 	new = ft_lstnew(NULL, sizeof(t_cmd*));
 	if (!(new->content = ft_memalloc(sizeof(t_cmd))))
 		return (NULL);
+	((t_cmd*)new->content)->input_file = 0;
 	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
 	{
-		if (ft_strcmp(args->content, "<") == '<')
+		x = 1;
+//		if (ft_strcmp(args->content, "<") == '<')
+//		TO DO : HEREDOC
+		if (*(char*)(args->content) == '<')
 		{
-
+			if ((char*)((t_cmd*)new->content)->input_file)
+				free((char*)((t_cmd*)new->content)->input_file);
+			while (ft_isspace((char)(args->content + x)))
+				x++;
+			((t_cmd*)new->content)->input_file = ft_strdup(args->content + x);
 		}
-//		else
+		else if (ft_strcmp(args->content, ">") == '>')
+		{
+			x++;
+			while (ft_isspace((char)(args->content + x)))
+				x++;
+			ft_lstaddend(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(args->content + x)), ft_strlen((char*)(args->content + x))));
+		}
+		else if (*(char*)(args->content) == '>')
+		{
+			while (ft_isspace((char)(args->content + x)))
+				x++;
+			ft_lstaddend(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(args->content + x)), ft_strlen((char*)(args->content + x))));
+		}
+
 		if (!(args = args->next))
 			return (NULL);
 	}
