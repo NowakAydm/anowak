@@ -109,12 +109,12 @@ int		redirect_output(t_cmd *cmd)
 			fd = 0;
 			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
 			{
+			}
 				ft_putstr_fd("Error : can't write output to file : ", 2);
 				ft_putendl_fd((cmd->out)->content, 2);
-			}
 //			printf("fd = %d\n", fd);
-			else
-				printf("dup2 return %d\n", dup2(fd, 1));
+//			else
+			ft_lstaddend(&(cmd->fd_out), ft_lstnew(&fd, sizeof(int)));
 			tmp = cmd->out;
 			cmd->out = (cmd->out)->next;
 			ft_lstdelone(&tmp, ft_lstdelcontent);
@@ -125,12 +125,12 @@ int		redirect_output(t_cmd *cmd)
 			fd = 0;
 			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
 			{
-				ft_putstr_fd("Error : can't write output to file : ", 2);
-				ft_putendl_fd((cmd->out)->content, 2);
 			}
+				ft_putstr_fd("Error : can't write output to end of file : ", 2);
+				ft_putendl_fd((cmd->out_append)->content, 2);
 //			printf("fd = %d\n", fd);
-			else
-				printf("dup2 return %d\n", dup2(fd, 1));
+//			else
+			ft_lstadd(&(cmd->fd_out), ft_lstnew(&fd, sizeof(int)));
 			tmp = cmd->out_append;
 			cmd->out_append = (cmd->out_append)->next;
 			ft_lstdelone(&tmp, ft_lstdelcontent);
@@ -144,7 +144,9 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
 	int		pipe_des[2];
-	
+	t_list	*tmp;
+
+	redirect_output(cmd->piped_to);
 	if (pipe(pipe_des))
 		return (-1);
 	child = fork();
@@ -163,12 +165,24 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 			return (-1);
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
-		redirect_output(cmd->piped_to);
+
+		tmp = cmd->fd_out;
+		while (tmp)
+		{
+			printf("dup2 return %d\n", dup2(*(int*)(tmp->content), 0));
+			tmp = tmp->next;
+		}
 		execve((cmd->piped_to)->path, (cmd->piped_to)->argv, *env_dup);
 		return (0);
 	}
 	
 // PROCESSUS PARENT
+	tmp = cmd->fd_out;
+	while (tmp)
+	{
+		printf("close(%d) return %d\n",*(int*)(tmp->content), close(*(int*)(tmp->content)));
+		tmp = tmp->next;
+	}
 	dup2(pipe_des[0], 0);
 	close(pipe_des[1]);
 	wait(NULL);
@@ -180,12 +194,16 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
 	int		ret;
+	t_list*	tmp;
 
 	ret = 0;
 	signal(SIGINT, SIG_DFL);
 	signal(SIGTSTP, SIG_IGN);
 	if (signal(SIGINT, process_terminate_in_process) == SIG_ERR)
 		ft_putendl_fd("Error : can't catch signal", 2);
+
+	if (!(new->piped_to))
+		redirect_output(new);
 	new->pid = fork();
 	if (new->pid == -1)
 		ft_putendl_fd("Error : Could'nt fork", 2);
@@ -196,7 +214,12 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 			ret = pipe_it_up(new, sh, env_dup);
 		else
 		{
-			redirect_output(new);
+			tmp = new->fd_out;
+			while (tmp)
+			{
+				printf("dup2(%d) return %d\n", *(int*)(tmp->content), dup2(*(int*)(tmp->content), 1));
+				tmp = tmp->next;
+			}
 			ret = execve(new->path, new->argv, *env_dup);
 		}
 		if (ret == -1)
@@ -208,6 +231,12 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 	else
 	{
 // PROCESSUS PARENT
+		tmp = new->fd_out;
+		while (tmp)
+		{
+			printf("close(%d) return %d\n",*(int*)(tmp->content), close(*(int*)(tmp->content)));
+			tmp = tmp->next;
+		}
 		if ((ret = wait(&(new->status))) == -1)
 			ft_putendl_fd("Error : Wait returned -1", 2);
 		print_ret_message(new->status, new->argv[0]);

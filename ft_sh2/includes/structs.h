@@ -37,6 +37,7 @@ typedef struct		s_cmd
 	char			*input_file;
 	t_list			*out;
 	t_list			*out_append;
+	t_list			*fd_out;
 //	int				fd_in;
 //	int				fd_out;
 }					t_cmd;
