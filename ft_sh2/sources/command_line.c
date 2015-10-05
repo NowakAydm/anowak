@@ -85,26 +85,33 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 				x++;
 			((t_cmd*)new->content)->input_file = ft_strdup(file + x);
 		}
-		else if (ft_strcmp(file, ">") == '>')
+		else if (ft_strcmp(file, ">") == '>'
+				 && !(((t_cmd*)new->content)->out_append)
+				 && !(((t_cmd*)new->content)->out))
 		{
 			x++;
 			while (ft_isspace(file[x]))
 				x++;
 			printf("Found a >> redirection to %s\n", file + x);
 			if (file[x])
-				ft_lstaddend(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
+				ft_lstadd(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
 		}
-		else if (*file == '>')
+		else if (*file == '>'
+				 && !(((t_cmd*)new->content)->out_append)
+				 && !(((t_cmd*)new->content)->out))
 		{
 			while (ft_isspace(file[x]))
 				x++;
 			printf("Found a > redirection to %s\n", file + x);
 			if (file[x])
-				ft_lstaddend(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
+				ft_lstadd(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
 		}
 
 		if (!(args = args->next))
+		{
+			ft_lstdel(&new, ft_lstdelcontent);
 			return (NULL);
+		}
 	}
 	((t_cmd*)new->content)->argv = ft_lsttotab(&args);
 	((t_cmd*)new->content)->argc = ft_tablen(((t_cmd*)new->content)->argv);

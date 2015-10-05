@@ -99,43 +99,32 @@ void	print_ret_message(int status, char *cmd)
 int		redirect_output(t_cmd *cmd)
 {
 	int		fd;
-	t_list	*tmp;
 
+	fd = 0;
 	if (cmd->out || cmd->out_append)
 	{
-		while (cmd->out)
+		cmd->fd_out = 1;
+		if (cmd->out)
 		{
-//			printf("Duplicating out for file '%s'\n", (cmd->out)->content);
-			fd = 0;
+			printf("Duplicating out for file '%s'\n", (cmd->out)->content);
 			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
 			{
-			}
 				ft_putstr_fd("Error : can't write output to file : ", 2);
 				ft_putendl_fd((cmd->out)->content, 2);
-//			printf("fd = %d\n", fd);
-//			else
-			ft_lstaddend(&(cmd->fd_out), ft_lstnew(&fd, sizeof(int)));
-			tmp = cmd->out;
-			cmd->out = (cmd->out)->next;
-			ft_lstdelone(&tmp, ft_lstdelcontent);
+			}
+			ft_lstdel(&cmd->out, ft_lstdelcontent);
 		}
-		while (cmd->out_append)
+		else if (cmd->out_append)
 		{
-//			printf("Duplicating out for file '%s'\n", (cmd->out_append)->content);
-			fd = 0;
+			printf("Duplicating out for file '%s'\n", (cmd->out_append)->content);
 			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
 			{
-			}
 				ft_putstr_fd("Error : can't write output to end of file : ", 2);
 				ft_putendl_fd((cmd->out_append)->content, 2);
-//			printf("fd = %d\n", fd);
-//			else
-			ft_lstadd(&(cmd->fd_out), ft_lstnew(&fd, sizeof(int)));
-			tmp = cmd->out_append;
-			cmd->out_append = (cmd->out_append)->next;
-			ft_lstdelone(&tmp, ft_lstdelcontent);
+			}
+			ft_lstdel(&cmd->out_append, ft_lstdelcontent);
 		}
-//		close(1);
+		cmd->fd_out = fd;
 	}
 	return (0);
 }
@@ -144,9 +133,9 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
 	int		pipe_des[2];
-	t_list	*tmp;
 
 	redirect_output(cmd->piped_to);
+
 	if (pipe(pipe_des))
 		return (-1);
 	child = fork();
@@ -161,32 +150,36 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 // PROCESSUS FILS
 		dup2(pipe_des[1], 1);
 		close(pipe_des[0]);
+
 		if (process_command(cmd->piped_to, sh))
 			return (-1);
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
 
-		tmp = cmd->fd_out;
-		while (tmp)
+		if ((cmd->piped_to)->fd_out)
 		{
-			printf("dup2 return %d\n", dup2(*(int*)(tmp->content), 0));
-			tmp = tmp->next;
+			ft_putendl_fd("OUIIIII", 2);
+			(cmd->piped_to)->piped_to = NULL;
+			do_the_fork_thing(cmd->piped_to, sh, env_dup);
 		}
+
 		execve((cmd->piped_to)->path, (cmd->piped_to)->argv, *env_dup);
+
 		return (0);
 	}
 	
 // PROCESSUS PARENT
-	tmp = cmd->fd_out;
-	while (tmp)
-	{
-		printf("close(%d) return %d\n",*(int*)(tmp->content), close(*(int*)(tmp->content)));
-		tmp = tmp->next;
-	}
+	if (cmd->fd_out)
+		close((cmd->piped_to)->fd_out);
+
 	dup2(pipe_des[0], 0);
 	close(pipe_des[1]);
 	wait(NULL);
 	redirect_output(cmd);
+
+	if (cmd->fd_out)
+		dup2(cmd->fd_out, 1);
+
 	execve(cmd->path, cmd->argv, *env_dup);
 	return (0);
 }
@@ -194,7 +187,6 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
 	int		ret;
-	t_list*	tmp;
 
 	ret = 0;
 	signal(SIGINT, SIG_DFL);
@@ -214,12 +206,8 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 			ret = pipe_it_up(new, sh, env_dup);
 		else
 		{
-			tmp = new->fd_out;
-			while (tmp)
-			{
-				printf("dup2(%d) return %d\n", *(int*)(tmp->content), dup2(*(int*)(tmp->content), 1));
-				tmp = tmp->next;
-			}
+			if (new->fd_out)
+				printf("dup2 return %d\n", dup2(new->fd_out, 1));			
 			ret = execve(new->path, new->argv, *env_dup);
 		}
 		if (ret == -1)
@@ -231,12 +219,9 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 	else
 	{
 // PROCESSUS PARENT
-		tmp = new->fd_out;
-		while (tmp)
-		{
-			printf("close(%d) return %d\n",*(int*)(tmp->content), close(*(int*)(tmp->content)));
-			tmp = tmp->next;
-		}
+		if (new->fd_out)
+			printf("close(%d) return %d\n", new->fd_out, close(new->fd_out));
+
 		if ((ret = wait(&(new->status))) == -1)
 			ft_putendl_fd("Error : Wait returned -1", 2);
 		print_ret_message(new->status, new->argv[0]);
