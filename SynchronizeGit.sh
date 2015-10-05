@@ -1,4 +1,4 @@
-cp ~/projects/.emacs .. ; cp ~/projects/.zshrc ..
+cp -v ~/projects/.emacs .. ; cp -v ~/projects/.zshrc ..
 
 git status
 git add -A
