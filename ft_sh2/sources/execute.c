@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/22 15:15:32 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/06 14:37:58 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,26 @@ void	print_ret_message(int status, char *cmd)
 	}
 }
 
+int		redirect_input(t_cmd *cmd)
+{
+	int		ret;
+	char	*str;
+
+	ret = 1;
+	str = NULL;
+	if (cmd->input_file)
+	{
+		cmd->fd_in = open(cmd->input_file, O_RDONLY);
+		if (cmd->fd_in == -1)
+		{
+			ft_putstr_fd("Error : can't open file : ", 2);
+			ft_putendl_fd(cmd->input_file, 2);			
+			return (-1);
+		}
+	}
+	return (0);
+}
+
 int		redirect_output(t_cmd *cmd)
 {
 	int		fd;
@@ -106,7 +126,6 @@ int		redirect_output(t_cmd *cmd)
 		cmd->fd_out = 1;
 		if (cmd->out)
 		{
-			printf("Duplicating out for file '%s'\n", (cmd->out)->content);
 			if ((fd = open((cmd->out)->content, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
 			{
 				ft_putstr_fd("Error : can't write output to file : ", 2);
@@ -116,7 +135,6 @@ int		redirect_output(t_cmd *cmd)
 		}
 		else if (cmd->out_append)
 		{
-			printf("Duplicating out for file '%s'\n", (cmd->out_append)->content);
 			if ((fd = open((cmd->out_append)->content, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
 			{
 				ft_putstr_fd("Error : can't write output to end of file : ", 2);
@@ -133,6 +151,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
 	int		pipe_des[2];
+	t_cmd	*tmp;
 
 	redirect_output(cmd->piped_to);
 
@@ -156,9 +175,13 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
 
+		if (!redirect_input(cmd->piped_to))
+			dup2((cmd->piped_to)->fd_in, 0);
+		else
+			exit(1);
+
 		if ((cmd->piped_to)->fd_out)
 		{
-			ft_putendl_fd("OUIIIII", 2);
 			(cmd->piped_to)->piped_to = NULL;
 			do_the_fork_thing(cmd->piped_to, sh, env_dup);
 		}
@@ -169,18 +192,40 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	}
 	
 // PROCESSUS PARENT
-	if (cmd->fd_out)
-		close((cmd->piped_to)->fd_out);
+
 
 	dup2(pipe_des[0], 0);
 	close(pipe_des[1]);
+	
+	if (cmd->fd_out)
+		close((cmd->piped_to)->fd_out);
+
 	wait(NULL);
 	redirect_output(cmd);
 
 	if (cmd->fd_out)
 		dup2(cmd->fd_out, 1);
 
+
+//* Comment this to unable input redirections on piped commands
+//	if (cmd->input_file)
+//		ft_putendl_fd("Error : can't redirect input of a piped command", 2);
+	if (cmd->input_file)
+	{
+		tmp = cmd->piped_to;
+		cmd->piped_to = NULL;
+		if (cmd->out)
+		{
+			cmd->out_append = cmd->out;
+			cmd->out = NULL;
+		}
+		do_the_fork_thing(cmd, sh, env_dup);		
+		cmd->piped_to = tmp;		
+	}
+//*/
+
 	execve(cmd->path, cmd->argv, *env_dup);
+
 	return (0);
 }
 
@@ -207,7 +252,14 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		else
 		{
 			if (new->fd_out)
-				printf("dup2 return %d\n", dup2(new->fd_out, 1));			
+				dup2(new->fd_out, 1);			
+			if (!redirect_input(new))
+				dup2(new->fd_in, 0);
+			else
+			{
+				
+				exit(1);
+			}
 			ret = execve(new->path, new->argv, *env_dup);
 		}
 		if (ret == -1)
@@ -220,7 +272,7 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 	{
 // PROCESSUS PARENT
 		if (new->fd_out)
-			printf("close(%d) return %d\n", new->fd_out, close(new->fd_out));
+			close(new->fd_out);
 
 		if ((ret = wait(&(new->status))) == -1)
 			ft_putendl_fd("Error : Wait returned -1", 2);

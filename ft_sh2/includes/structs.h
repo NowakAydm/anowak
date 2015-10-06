@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:50:55 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 14:19:29 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/06 14:42:31 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,11 @@ typedef struct		s_cmd
 	int				pipe;
 	struct s_cmd	*piped_to;
 	char			*input_file;
+	char			*heredoc;
 	t_list			*out;
 	t_list			*out_append;
+	int				fd_in;
 	int				fd_out;
-//	int				fd_in;
-//	int				fd_out;
 }					t_cmd;
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/15 11:22:55 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/06 15:29:05 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,25 @@ int		argument_is_in_quotes(char *line, t_list **list, int x)
 	int		y;
 
 	y = 0;
-	if (!(y = dist_to_next_quote(line + x, line[x - 1])))
-		return (0);
-	else if (y++)
+	if (!(y = dist_to_next_quote(line + x, line[x])))
 	{
-		if (!(str = ft_strndup(line + x, y - 1)))
+		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
+		return (x + 2);
+	}
+	else if (y <= 2)
+	{
+		printf("Found another quote y = %d\n", y);
+		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
+		return (x + 2);
+	}
+	else
+	{
+		printf("Found another quote y = %d\n", y);
+		if (!(str = ft_strndup(line + x, y)))
 			return (0);
 		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
 		free(str);
+		y++;
 	}
 // TODO: corriger le comportement pour "ls ''-a" et "ls '' -a"
 	return (x + y);
@@ -110,7 +121,7 @@ t_list	*split_into_args(char *line, char ***env, int ret)
 		while (ft_isspace(line[x]))
 			x++;
 		if (ft_isquote(line[x]))
-			x = argument_is_in_quotes(line, &list, ++x);
+			x = argument_is_in_quotes(line, &list, x);
 		else if (line[x])
 			x = argument_not_in_quotes(line, &list, x);
 		if (!x)

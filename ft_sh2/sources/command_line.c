@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 14:19:44 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/06 15:31:14 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,52 +61,73 @@ char	*get_command_line(void)
 	return ((write(1, "\n", 1) ? NULL : NULL));
 }
 
+void	add_input_redirection(t_cmd *cmd, char *arg)
+{
+	int x;
+
+	x = 1;
+	if (ft_strcmp(arg, "<") == '<')
+	{
+		ft_putendl("adding <<");
+		x++;
+		while (ft_isspace(arg[x]))
+			x++;
+		
+		cmd->heredoc = ft_strdup((char*)(arg + x));
+	}
+	else if (*arg == '<')
+	{
+		ft_putendl("adding <");
+		if ((char*)cmd->input_file)
+			free((char*)cmd->input_file);
+		while (ft_isspace(arg[x]))
+			x++;
+		cmd->input_file = ft_strdup(arg + x);
+	}
+
+}
+
+void	add_output_redirection(t_cmd *cmd, char *arg)
+{
+	int x;
+
+	x = 1;
+	if (ft_strcmp(arg, ">") == '>')
+	{
+		x++;
+		while (ft_isspace(arg[x]))
+			x++;
+		if (arg[x])
+			ft_lstadd(&cmd->out_append, ft_lstnew(ft_strdup((char*)(arg + x)), ft_strlen((char*)(arg + x))));
+	}
+	else if (*arg == '>')
+	{
+		while (ft_isspace(arg[x]))
+			x++;
+		if (arg[x])
+			ft_lstadd(&cmd->out, ft_lstnew(ft_strdup((char*)(arg + x)), ft_strlen((char*)(arg + x))));
+	}
+}
+
+
 t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 {
 	t_list	*new;
-	int		x;
-	char	*file;
 
 	new = ft_lstnew(NULL, sizeof(t_cmd*));
 	if (!(new->content = ft_memalloc(sizeof(t_cmd))))
 		return (NULL);
-	((t_cmd*)new->content)->input_file = 0;
+	((t_cmd*)new->content)->input_file = NULL;
+	((t_cmd*)new->content)->heredoc = NULL;
+	((t_cmd*)new->content)->out = NULL;
+	((t_cmd*)new->content)->out_append = NULL;
 	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
 	{
-		x = 1;
-		file = (char*)(args->content);
-//		if (ft_strcmp(args->content, "<") == '<')
-//		TO DO : HEREDOC
-		if (*file == '<')
-		{
-			if ((char*)((t_cmd*)new->content)->input_file)
-				free((char*)((t_cmd*)new->content)->input_file);
-			while (ft_isspace(file[x]))
-				x++;
-			((t_cmd*)new->content)->input_file = ft_strdup(file + x);
-		}
-		else if (ft_strcmp(file, ">") == '>'
-				 && !(((t_cmd*)new->content)->out_append)
-				 && !(((t_cmd*)new->content)->out))
-		{
-			x++;
-			while (ft_isspace(file[x]))
-				x++;
-			printf("Found a >> redirection to %s\n", file + x);
-			if (file[x])
-				ft_lstadd(&((t_cmd*)new->content)->out_append, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
-		}
-		else if (*file == '>'
-				 && !(((t_cmd*)new->content)->out_append)
-				 && !(((t_cmd*)new->content)->out))
-		{
-			while (ft_isspace(file[x]))
-				x++;
-			printf("Found a > redirection to %s\n", file + x);
-			if (file[x])
-				ft_lstadd(&((t_cmd*)new->content)->out, ft_lstnew(ft_strdup((char*)(file + x)), ft_strlen((char*)(file + x))));
-		}
-
+		if (!(((t_cmd*)new->content)->input_file && !!(((t_cmd*)new->content)->heredoc)))
+			add_input_redirection(new->content, args->content);
+		if (!(((t_cmd*)new->content)->out_append) && !(((t_cmd*)new->content)->out))
+			add_output_redirection(new->content, args->content);
+		
 		if (!(args = args->next))
 		{
 			ft_lstdel(&new, ft_lstdelcontent);
