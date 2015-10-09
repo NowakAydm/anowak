@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/06 14:37:58 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 19:58:02 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,9 +100,11 @@ int		redirect_input(t_cmd *cmd)
 {
 	int		ret;
 	char	*str;
+	t_list	*tmp;
 
 	ret = 1;
 	str = NULL;
+	cmd->fd_in = 0;
 	if (cmd->input_file)
 	{
 		cmd->fd_in = open(cmd->input_file, O_RDONLY);
@@ -112,6 +114,22 @@ int		redirect_input(t_cmd *cmd)
 			ft_putendl_fd(cmd->input_file, 2);			
 			return (-1);
 		}
+	}
+	if (cmd->heredoc)
+	{
+		pipe(cmd->heredoc_pipe);
+		if (cmd->fd_in)
+			dup2(cmd->fd_in, cmd->heredoc_pipe[0]);
+		else
+			cmd->fd_in = cmd->heredoc_pipe[0];
+		tmp = cmd->heredoc_list;
+		while (tmp)
+		{
+			write(cmd->heredoc_pipe[1], tmp->content, ft_strlen(tmp->content));
+			write(cmd->heredoc_pipe[1], "\n", 1);
+			tmp = tmp->next;
+		}
+		close(cmd->heredoc_pipe[1]);
 	}
 	return (0);
 }
@@ -167,6 +185,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	else if (child == 0)
 	{
 // PROCESSUS FILS
+
 		dup2(pipe_des[1], 1);
 		close(pipe_des[0]);
 
@@ -175,16 +194,16 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
 
-		if (!redirect_input(cmd->piped_to))
-			dup2((cmd->piped_to)->fd_in, 0);
-		else
-			exit(1);
-
 		if ((cmd->piped_to)->fd_out)
 		{
 			(cmd->piped_to)->piped_to = NULL;
 			do_the_fork_thing(cmd->piped_to, sh, env_dup);
 		}
+
+		if (!redirect_input(cmd->piped_to))
+			dup2((cmd->piped_to)->fd_in, 0);
+		else
+			exit(1);
 
 		execve((cmd->piped_to)->path, (cmd->piped_to)->argv, *env_dup);
 
@@ -192,25 +211,26 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	}
 	
 // PROCESSUS PARENT
-
-
+	
 	dup2(pipe_des[0], 0);
 	close(pipe_des[1]);
-	
 	if (cmd->fd_out)
 		close((cmd->piped_to)->fd_out);
+	if ((cmd->piped_to)->heredoc)
+	{
+		close((cmd->piped_to)->heredoc_pipe[0]);
+		close((cmd->piped_to)->heredoc_pipe[1]);
+	}
 
 	wait(NULL);
-	redirect_output(cmd);
 
+	redirect_output(cmd);
 	if (cmd->fd_out)
 		dup2(cmd->fd_out, 1);
-
-
 //* Comment this to unable input redirections on piped commands
 //	if (cmd->input_file)
 //		ft_putendl_fd("Error : can't redirect input of a piped command", 2);
-	if (cmd->input_file)
+	if (cmd->input_file || cmd->heredoc)
 	{
 		tmp = cmd->piped_to;
 		cmd->piped_to = NULL;
@@ -223,13 +243,12 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 		cmd->piped_to = tmp;		
 	}
 //*/
-
 	execve(cmd->path, cmd->argv, *env_dup);
 
 	return (0);
 }
 
-void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
+int		do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 {
 	int		ret;
 
@@ -253,13 +272,13 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		{
 			if (new->fd_out)
 				dup2(new->fd_out, 1);			
+//			if (new->heredoc)
+//				dup2(new->heredoc_pipe[0], 0);				
 			if (!redirect_input(new))
 				dup2(new->fd_in, 0);
 			else
-			{
-				
-				exit(1);
-			}
+				return (1);				
+
 			ret = execve(new->path, new->argv, *env_dup);
 		}
 		if (ret == -1)
@@ -271,6 +290,11 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 	else
 	{
 // PROCESSUS PARENT
+		if (new->heredoc)
+		{
+			close(new->heredoc_pipe[0]);
+			close(new->heredoc_pipe[1]);
+		}
 		if (new->fd_out)
 			close(new->fd_out);
 
@@ -278,7 +302,7 @@ void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 			ft_putendl_fd("Error : Wait returned -1", 2);
 		print_ret_message(new->status, new->argv[0]);
 	}
-	return ;
+	return (0);
 }
 
 int		process_command(t_cmd *new, t_ftsh *sh)
@@ -329,7 +353,7 @@ int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup)
 		if (new->is_builtin)
 			ret = execute_builtin(new, env_dup) - 1;
 		else
-			do_the_fork_thing(new, sh, env_dup);
+			ret = do_the_fork_thing(new, sh, env_dup);
 	}
 
 	if (new->path)

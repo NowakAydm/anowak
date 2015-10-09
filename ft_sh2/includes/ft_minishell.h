@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 16:03:12 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 17:50:15 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	catch_signals(void);
 int		check_permissions(char *path);
 int		find_path_to_command(t_cmd *new, char **path_dir);
 void	print_ret_message(int status, char *cmd);
-void	do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup);
+int		do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup);
 int		process_command(t_cmd *new, t_ftsh *sh);
 int		execute_command(t_cmd *new, t_ftsh *sh, char ***env_dup);
 
@@ -72,6 +72,7 @@ int		execute_command_line(t_ftsh *sh, char ***env_dup);
 int		argument_is_in_quotes(char *line, t_list **list, int x);
 int		argument_not_in_quotes(char *line, t_list **list, int x);
 t_list	*split_into_args(char *line, char ***env, int ret);
+char	*remove_char(char *str, char c);
 
 /*
 ** -------       quotes.c      --------

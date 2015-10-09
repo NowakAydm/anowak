@@ -6,7 +6,7 @@
 ;    by: thor <thor@42.fr>                           +#+  +:+       +#+         ;
 ;                                                  +#+#+#+#+#+   +#+            ;
 ;    Created: 2013/06/18 14:01:14 by thor               #+#    #+#              ;
-;    Updated: 2015/09/17 10:53:41 by anowak           ###   ########.fr        ;
+;    Updated: 2015/10/09 18:44:32 by anowak           ###   ########.fr        ;
 ;                                                                               ;
 ;*******************************************************************************;
 
@@ -48,6 +48,10 @@
   (defun track-mouse (e))
   (setq mouse-sel-mode t)
 )
+
+;; Scroll one line at a time
+(setq scroll-step            1
+      scroll-conservatively  10000)
 
 ;; Enable mouse support
 (global-set-key (kbd "<kp-0>") '"0")

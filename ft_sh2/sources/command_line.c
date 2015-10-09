@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 15:05:17 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 19:59:19 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ char	*get_command_line(void)
 	char	*tmp;
 	int		ret;
 
-	ret = 1;
 	line = NULL;
 	tmp = NULL;
+	ret = 1;
 	while ((ret = get_next_line_singlefd(0, &line)) != 0)
 	{
 		if (ret == -1)
@@ -61,6 +61,28 @@ char	*get_command_line(void)
 	return ((write(1, "\n", 1) ? NULL : NULL));
 }
 
+int		get_heredoc(t_cmd *cmd)
+{
+	char	*line;
+	int		ret;
+
+	line = NULL;
+	ret = 1;
+	while (ft_strcmp(line, cmd->heredoc) != 0)
+	{
+		ft_putstr("heredoc > ");
+
+//TODO : CTRL-c during heredoc input
+
+		ret = get_next_line_singlefd(0, &line);
+		if (ret == -1)
+			return (-1);
+		if (ft_strcmp(line, cmd->heredoc) != 0)
+			ft_lstaddend(&(cmd->heredoc_list), ft_lstnew(line, ft_strlen(line)));
+	}
+	return (0);
+}
+
 void	add_input_redirection(t_cmd *cmd, char *arg)
 {
 	int x;
@@ -72,7 +94,8 @@ void	add_input_redirection(t_cmd *cmd, char *arg)
 		while (ft_isspace(arg[x]))
 			x++;		
 		cmd->heredoc = ft_strdup((char*)(arg + x));
-		ft_putendl(cmd->heredoc);
+		get_heredoc(cmd);
+		pipe(cmd->heredoc_pipe);
 	}
 	else if (*arg == '<')
 	{

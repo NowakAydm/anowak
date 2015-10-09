@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 19:42:06 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/15 11:05:03 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 16:30:11 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int		dist_to_next_quote(char *line, int c)
 {
 	int y;
 
-	y = 0;
+	y = 1;
 	while (line[y] && line[y] != c)
 		if (line[y++] == '\\')
 			y++;

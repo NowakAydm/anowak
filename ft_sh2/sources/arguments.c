@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/06 15:29:05 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 18:07:26 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,30 +16,36 @@ int		argument_is_in_quotes(char *line, t_list **list, int x)
 {
 	char	*str;
 	int		y;
+	int		z;
 
-	y = 0;
-	if (!(y = dist_to_next_quote(line + x, line[x])))
+	z = 0;
+	if (line[x] == '<' || line[x] == '>')
 	{
-		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
-		return (x + 2);
+		z++;
+		if (line[x + z])
+			if (line[x + z] == '<' || line[x + z] == '>')
+				z++;
+		while (ft_isspace(line[x + z]))
+			z++;
 	}
-	else if (y <= 2)
+
+	if (!(y = dist_to_next_quote(line + x + z, line[x + z])))
+		return (0);
+	else if (y == 1)
 	{
-		printf("Found another quote y = %d\n", y);
 		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
-		return (x + 2);
+		return (x + z + 2);
 	}
 	else
 	{
-		printf("Found another quote y = %d\n", y);
-		if (!(str = ft_strndup(line + x, y)))
+		if (!(str = ft_strndup(line + x, y + z)))
 			return (0);
+		str = remove_char(str, line[x + z]);
 		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
 		free(str);
 		y++;
 	}
-// TODO: corriger le comportement pour "ls ''-a" et "ls '' -a"
-	return (x + y);
+	return (x + y + z);
 }
 
 int		argument_not_in_quotes(char *line, t_list **list, int x)
@@ -67,6 +73,9 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 		while (ft_isspace(line[x + y]))
 			y++;
 	}
+	if (ft_isquote(line[x + y]))
+		return (argument_is_in_quotes(line, list, x));
+
 	while (line[x + y] && !(ft_isspace(line[x + y]))
 		   && !(ft_isquote(line[x + y]))
 		   && !(ft_strchr("|;<>", line[x + y])))
@@ -74,12 +83,35 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 			y++;
 	if (y)
 	{
-		if (!(str = ft_strndup((line + x), y)))
+		str = ft_strndup((line + x), y);
+		if (!(str = remove_char(str, '\\')))
 			return (0);
 		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
 		free(str);
 	}
 	return (x + y);
+}
+
+char	*remove_char(char *str, char c)
+{
+	char	*new;
+	char	*spot;
+
+	if (ft_strchr(str, c))
+	{
+		new = ft_strdup(str);
+		while ((spot = ft_strchr(new, c)))
+		{
+			*spot = '\0';
+			ft_strcat(new, spot + 1);
+			spot = NULL;
+		}
+		spot = ft_strdup(new);
+		free(new);
+		free(str);
+		return (spot);
+	}
+	return (str);
 }
 
 void	replace_by_env_var(t_list *list, char **env, int ret)
