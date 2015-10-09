@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/06 15:31:14 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/09 15:05:17 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,16 +68,14 @@ void	add_input_redirection(t_cmd *cmd, char *arg)
 	x = 1;
 	if (ft_strcmp(arg, "<") == '<')
 	{
-		ft_putendl("adding <<");
 		x++;
 		while (ft_isspace(arg[x]))
-			x++;
-		
+			x++;		
 		cmd->heredoc = ft_strdup((char*)(arg + x));
+		ft_putendl(cmd->heredoc);
 	}
 	else if (*arg == '<')
 	{
-		ft_putendl("adding <");
 		if ((char*)cmd->input_file)
 			free((char*)cmd->input_file);
 		while (ft_isspace(arg[x]))
@@ -123,9 +121,9 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 	((t_cmd*)new->content)->out_append = NULL;
 	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
 	{
-		if (!(((t_cmd*)new->content)->input_file && !!(((t_cmd*)new->content)->heredoc)))
+		if (!((t_cmd*)new->content)->input_file && !((t_cmd*)new->content)->heredoc)
 			add_input_redirection(new->content, args->content);
-		if (!(((t_cmd*)new->content)->out_append) && !(((t_cmd*)new->content)->out))
+		if (!((t_cmd*)new->content)->out_append && !((t_cmd*)new->content)->out)
 			add_output_redirection(new->content, args->content);
 		
 		if (!(args = args->next))
