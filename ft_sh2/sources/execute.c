@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 19:58:02 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/12 16:50:16 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,11 +165,27 @@ int		redirect_output(t_cmd *cmd)
 	return (0);
 }
 
+void	print_input_redirection_error(t_cmd *cmd)
+{
+	ft_putstr_fd("Error : ", 2);
+	ft_putstr_fd(cmd->argv[0], 2);
+	if (cmd->input_file)
+	{
+		ft_putstr_fd(" < ", 2);			
+		ft_putstr_fd(cmd->input_file, 2);
+	}
+	else
+	{
+		ft_putstr_fd(" << ", 2);			
+		ft_putstr_fd(cmd->heredoc, 2);
+	}
+	ft_putendl_fd(" : can't redirect input of a piped command", 2);
+}
+
 int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
 	int		pipe_des[2];
-	t_cmd	*tmp;
 
 	redirect_output(cmd->piped_to);
 
@@ -196,7 +212,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 
 		if ((cmd->piped_to)->fd_out)
 		{
-			(cmd->piped_to)->piped_to = NULL;
+//			(cmd->piped_to)->piped_to = NULL;
 			do_the_fork_thing(cmd->piped_to, sh, env_dup);
 		}
 
@@ -227,9 +243,13 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	redirect_output(cmd);
 	if (cmd->fd_out)
 		dup2(cmd->fd_out, 1);
-//* Comment this to unable input redirections on piped commands
-//	if (cmd->input_file)
-//		ft_putendl_fd("Error : can't redirect input of a piped command", 2);
+
+	if (cmd->input_file || cmd->heredoc)
+		print_input_redirection_error(cmd);
+
+/* Comment this to unable input redirections on piped commands
+	t_cmd	*tmp;
+
 	if (cmd->input_file || cmd->heredoc)
 	{
 		tmp = cmd->piped_to;

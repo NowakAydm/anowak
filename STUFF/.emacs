@@ -6,7 +6,7 @@
 ;    by: thor <thor@42.fr>                           +#+  +:+       +#+         ;
 ;                                                  +#+#+#+#+#+   +#+            ;
 ;    Created: 2013/06/18 14:01:14 by thor               #+#    #+#              ;
-;    Updated: 2015/10/09 18:44:32 by anowak           ###   ########.fr        ;
+;    Updated: 2015/10/12 15:02:22 by anowak           ###   ########.fr        ;
 ;                                                                               ;
 ;*******************************************************************************;
 
@@ -53,7 +53,7 @@
 (setq scroll-step            1
       scroll-conservatively  10000)
 
-;; Enable mouse support
+;; Enable keypad support
 (global-set-key (kbd "<kp-0>") '"0")
 (global-set-key (kbd "<kp-1>") '"1")
 (global-set-key (kbd "<kp-2>") '"2")
