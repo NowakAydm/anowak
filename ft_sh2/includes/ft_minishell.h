@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 17:50:15 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/14 18:53:16 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ int		execute_command_line(t_ftsh *sh, char ***env_dup);
 int		argument_is_in_quotes(char *line, t_list **list, int x);
 int		argument_not_in_quotes(char *line, t_list **list, int x);
 t_list	*split_into_args(char *line, char ***env, int ret);
+int		arg_is_fd_redirector(char *arg);
 char	*remove_char(char *str, char c);
 
 /*

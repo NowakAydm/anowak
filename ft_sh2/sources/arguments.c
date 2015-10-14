@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 18:07:26 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/14 19:58:22 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,9 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 		while (ft_isspace(line[x + y]))
 			y++;
 	}
+	else if (arg_is_fd_redirector(line + x))
+		y += 4;
+
 	if (ft_isquote(line[x + y]))
 		return (argument_is_in_quotes(line, list, x));
 
@@ -90,6 +93,24 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 		free(str);
 	}
 	return (x + y);
+}
+
+int		arg_is_fd_redirector(char *arg)
+{
+	int x;
+
+	x = 0;
+	if (!arg)
+		return (0);
+	while (ft_isspace(arg[x]))
+		   x++;
+	if (ft_isdigit(arg[x]))
+		x++;
+	if (x && ft_strcmp(arg + 1 ,">&") == '-')
+		return (1);
+	if (x && ft_isdigit(ft_strcmp(arg + 1 ,">&")))
+		return (1);
+	return (0);
 }
 
 char	*remove_char(char *str, char c)

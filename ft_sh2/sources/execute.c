@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/12 16:50:16 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/14 20:23:14 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,12 +182,34 @@ void	print_input_redirection_error(t_cmd *cmd)
 	ft_putendl_fd(" : can't redirect input of a piped command", 2);
 }
 
+void	redirect_fd(t_cmd *cmd)
+{
+	t_list	*tmp;
+
+	tmp = cmd->to_redirect;
+	while (tmp)
+	{
+		if (cmd->out || cmd->out_append || cmd->piped_to)
+			ft_putendl_fd("Error : cannot redirect output", 2);
+		else
+			printf("Redirecting '%d' to '%d' returns %d\n", *(char*)tmp->content - 48, *((char *)(tmp->content) + 3) - 48, dup2( *((char *)(tmp->content) + 3) - 48, (*(char*)tmp->content - 48)));
+		tmp = tmp->next;
+		if (tmp)
+			tmp = tmp->next;
+	}	
+	tmp = cmd->to_close;
+	while (tmp)
+	{
+		printf("Closing '%d' returns %d\n", *(char*)tmp->content - 48, close((*(char*)tmp->content) - 48));
+		tmp = tmp->next;
+	}
+}
+
 int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 {
 	pid_t	child;
 	int		pipe_des[2];
 
-	redirect_output(cmd->piped_to);
 
 	if (pipe(pipe_des))
 		return (-1);
@@ -201,7 +223,6 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	else if (child == 0)
 	{
 // PROCESSUS FILS
-
 		dup2(pipe_des[1], 1);
 		close(pipe_des[0]);
 
@@ -210,6 +231,8 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
 
+		redirect_output(cmd->piped_to);
+		redirect_fd(cmd->piped_to);
 		if ((cmd->piped_to)->fd_out)
 		{
 //			(cmd->piped_to)->piped_to = NULL;
@@ -241,6 +264,7 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 	wait(NULL);
 
 	redirect_output(cmd);
+	redirect_fd(cmd);
 	if (cmd->fd_out)
 		dup2(cmd->fd_out, 1);
 
@@ -299,6 +323,7 @@ int		do_the_fork_thing(t_cmd *new, t_ftsh *sh, char ***env_dup)
 			else
 				return (1);				
 
+			redirect_fd(new);
 			ret = execve(new->path, new->argv, *env_dup);
 		}
 		if (ret == -1)

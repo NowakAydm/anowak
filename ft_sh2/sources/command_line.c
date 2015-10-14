@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 19:59:19 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/14 19:55:46 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,20 +113,29 @@ void	add_output_redirection(t_cmd *cmd, char *arg)
 	int x;
 
 	x = 1;
+//	if (arg[0] == '1')
+//		x++;
 	if (ft_strcmp(arg, ">") == '>')
 	{
 		x++;
 		while (ft_isspace(arg[x]))
 			x++;
 		if (arg[x])
-			ft_lstadd(&cmd->out_append, ft_lstnew(ft_strdup((char*)(arg + x)), ft_strlen((char*)(arg + x))));
+			ft_lstadd(&cmd->out_append, ft_lstnew((char*)(arg + x), ft_strlen((char*)(arg + x))));
 	}
 	else if (*arg == '>')
 	{
 		while (ft_isspace(arg[x]))
 			x++;
 		if (arg[x])
-			ft_lstadd(&cmd->out, ft_lstnew(ft_strdup((char*)(arg + x)), ft_strlen((char*)(arg + x))));
+			ft_lstadd(&cmd->out, ft_lstnew((char*)(arg + x), ft_strlen((char*)(arg + x))));
+	}
+	else if (ft_isdigit(*arg) && ft_strcmp(arg + 1, ">&") == '-')
+		ft_lstadd(&cmd->to_close, ft_lstnew((char*)arg, 1));
+	else if (ft_isdigit(*arg) && ft_isdigit(ft_strcmp(arg + 1, ">&")))
+	{
+		ft_putendl(arg);
+		ft_lstadd(&cmd->to_redirect, ft_lstnew((char*)arg, 4));
 	}
 }
 
@@ -142,11 +151,14 @@ t_list	*add_to_command_list(t_list *list, t_list *args, int pipe)
 	((t_cmd*)new->content)->heredoc = NULL;
 	((t_cmd*)new->content)->out = NULL;
 	((t_cmd*)new->content)->out_append = NULL;
-	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>')
+	while (*(char*)(args->content) == '<' || *(char*)(args->content) == '>'
+		   || arg_is_fd_redirector((char*)(args->content)))
 	{
 		if (!((t_cmd*)new->content)->input_file && !((t_cmd*)new->content)->heredoc)
 			add_input_redirection(new->content, args->content);
 		if (!((t_cmd*)new->content)->out_append && !((t_cmd*)new->content)->out)
+			add_output_redirection(new->content, args->content);
+		if (arg_is_fd_redirector((char*)(args->content)))
 			add_output_redirection(new->content, args->content);
 		
 		if (!(args = args->next))
@@ -192,6 +204,8 @@ t_list	*process_command_line(char *line, char ***env_dup, int ret)
 			ft_lstdel(&new_cmd, ft_lstdelcontent);			
 		}
 		else if (*(char*)(cur->content) == '<' || *(char*)(cur->content) == '>')
+			ft_lstadd(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
+		else if (arg_is_fd_redirector((char*)cur->content))
 			ft_lstadd(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
 		else
 			ft_lstaddend(&new_cmd, ft_lstnew(cur->content, ft_strlen(cur->content)));
