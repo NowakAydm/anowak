@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 17:01:46 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 18:30:24 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 17:55:16 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 	sh = ft_memalloc(sizeof(t_ftsh));
 	if (sh)
 	{
+		if (initialize_term(sh, envp) == -1)
+			return (NULL);
 		sh->prompt = ft_strdup(PROMPT);
 		if (!(sh->prompt))
 			return (NULL);
@@ -88,7 +90,7 @@ int		main(int argc, char **argv, char **envp)
 	sh = intialize_sh(argc, argv, envp);
 	if (!sh)
 	{
-		ft_putendl_fd("Error : could'nt allocate enough memory", 2);
+		ft_putendl_fd("Error : could'nt initialize shell", 2);
 		return (1);
 	}
 	while (1)

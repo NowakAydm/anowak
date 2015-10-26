@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/03 11:50:17 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/21 15:03:28 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 17:48:20 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,12 +149,12 @@ int			ft_putwstr(const wchar_t *s);
 int			ft_atoi_neg(const char *str);
 int			ft_btoi(const char *s);
 double		ft_puiss(int n, int puiss);
-
 int			ft_tablen(char **tab);
 void		ft_tabfree(char **tab);
 char		**ft_tabadd(char ***tab, char *str);
-
 char		**ft_tabdup(char **tab);
 int			ft_isquote(int c);
+int			ft_isparenthesis(int c);
+int			ft_toclosingparenthesis(int c);
 
 #endif

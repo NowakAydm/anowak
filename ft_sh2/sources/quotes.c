@@ -6,11 +6,37 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 19:42:06 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/09 16:30:11 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 17:16:06 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
+
+int		check_parenthesis(char *line)
+{
+	int		x;
+	int		ret;
+
+	x = -1;
+	while (line[++x])
+	{
+		if (line[x] == '(' || line[x] == '[' || line[x] == '{')
+		{
+			ret = line[x++];
+			while (line[x] && line[x] != ft_toclosingparenthesis(ret))
+				if (line[x++] == '\\')
+					x++;
+			if (!(line[x]))
+				return (write(1, "> ", 2));
+			else
+				ret = 0;
+		}
+		else if (line[x] == '\\')
+			if (!(line[++x]))
+				return ((write(1, "> ", 2) ? 1 : 1));
+	}	
+	return (ret);
+}
 
 int		check_pipe(char *line)
 {

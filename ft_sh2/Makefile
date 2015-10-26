@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/25 14:42:56 by anowak            #+#    #+#              #
-#    Updated: 2015/07/21 09:07:51 by anowak           ###   ########.fr        #
+#    Updated: 2015/10/26 18:37:31 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -29,7 +29,8 @@ SRC =		ft_minishell2.c	\
 			builtin_exit.c	\
 			builtin_setenv.c\
 			builtin_unsetenv.c\
-			command_line.c
+			command_line.c	\
+			term.c
 
 SRCS =		$(addprefix $(SRC_DIR)/, $(not_dir $(SRC))
 
@@ -51,7 +52,7 @@ $(NAME) :
 	@echo "\033[31m|\033[33m  - Compilation of source files   \033[31m|\033[0m"
 	@make $(OBJ)
 	@echo "\033[31m|\033[33m  - Compilation of ft_minishell2  \033[31m|\033[0m"
-	@$(CC) -o $(NAME) $(CC_FLAGS) -I $(HEAD_DIR) libft/libft.a $(OBJS)
+	@$(CC) $(CC_FLAGS) -lncurses -o $(NAME) -I $(HEAD_DIR) libft/libft.a $(OBJS)
 	@echo "\033[31mx============= \033[32mDONE ! \033[31m=============x\033[0m"
 	@echo ""
 	@echo ""

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/14 19:55:46 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 16:58:32 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ char	*get_command_line(void)
 		if (line)
 		{
 			if ((ret = check_quotes_in_line(line)) == 0
-				&& (ret = check_pipe(line)) == 0)
+				&& (ret = check_pipe(line)) == 0
+				&& (ret = check_parenthesis(line)) == 0)
 				return (line);
 			tmp = line;
 			line = NULL;

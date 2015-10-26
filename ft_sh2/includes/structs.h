@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:50:55 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/14 19:35:00 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 18:06:25 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@ typedef struct		s_ftsh
 	int				argc;
 	char			**argv;
 	int				ret;
+	char			*term_name;
+	struct termios	*term;
+	struct termios	*term_bak;
 }					t_ftsh;
 
 typedef struct		s_cmd

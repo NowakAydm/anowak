@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 17:15:48 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/14 20:23:14 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 16:52:13 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,10 +228,11 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 
 		if (process_command(cmd->piped_to, sh))
 			return (-1);
+		redirect_output(cmd->piped_to);
+
 		if ((cmd->piped_to)->piped_to)
 			pipe_it_up(cmd->piped_to, sh, env_dup);
 
-		redirect_output(cmd->piped_to);
 		redirect_fd(cmd->piped_to);
 		if ((cmd->piped_to)->fd_out)
 		{
@@ -261,9 +262,10 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup)
 		close((cmd->piped_to)->heredoc_pipe[1]);
 	}
 
+	redirect_output(cmd);
+
 	wait(NULL);
 
-	redirect_output(cmd);
 	redirect_fd(cmd);
 	if (cmd->fd_out)
 		dup2(cmd->fd_out, 1);

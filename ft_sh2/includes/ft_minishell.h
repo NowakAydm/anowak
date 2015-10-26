@@ -6,12 +6,15 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/14 18:53:16 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/26 18:23:36 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_MINISHELL_H
 # define FT_MINISHELL_H
+
+# include "../libft/includes/libft.h"
+# include "structs.h"
 
 # include <stdio.h>
 
@@ -23,9 +26,11 @@
 # include <signal.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <termios.h>
+# include <curses.h>
+# include <term.h>
+# undef tab
 
-# include "../libft/includes/libft.h"
-# include "structs.h"
 
 # define PROMPT "$> "
 
@@ -78,6 +83,7 @@ char	*remove_char(char *str, char c);
 /*
 ** -------       quotes.c      --------
 */
+int		check_parenthesis(char *line);
 int		check_pipe(char *line);
 int		prompt_missing_quote(int ret);
 int		check_quotes_in_line(char *line);
@@ -95,5 +101,11 @@ int		builtin_unsetenv(char **av, char ***env);
 int		builtin_env(char **env);
 int		execute_builtin(t_cmd *cmd, char ***envp);
 int		check_builtin(t_cmd *cmd);
+
+/*
+** -------      term.c     --------
+*/
+int		initialize_term(t_ftsh *sh, char **envp);
+
 
 #endif
