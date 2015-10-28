@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/26 18:23:36 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/28 14:57:10 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ int		check_builtin(t_cmd *cmd);
 /*
 ** -------      term.c     --------
 */
+void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
 
 

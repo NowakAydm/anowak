@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 17:01:46 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/26 17:55:16 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/28 16:12:46 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,9 @@ int		main(int argc, char **argv, char **envp)
 			sh->path_dir = extract_path_directories(sh->env_dup);
 		}
 		else
+		{
+			restore_term(NULL);
 			exit(1);
+		}
 	}
 }

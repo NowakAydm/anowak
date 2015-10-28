@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 17:31:51 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/22 15:17:32 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/28 14:55:59 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void		process_buserr(int signum)
 {
 	(void)signum;
 	ft_putendl_fd("\nCaught 'Bus Error'", 2);
+	restore_term(NULL);
 	exit(1);
 	return ;
 }
@@ -40,6 +41,7 @@ void		process_segfault(int signum)
 {
 	(void)signum;
 	ft_putendl_fd("\nCaught 'Segmentation Fault'", 2);
+	restore_term(NULL);
 	exit(1);
 	return ;
 }
