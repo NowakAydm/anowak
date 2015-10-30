@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 15:28:10 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 17:29:02 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,60 @@ int		initialize_term(t_ftsh *sh, char **envp)
 	return (-1);
 }
 
-char	*process_key(char *key)
+int		read_next_char(char **line)
+{
+	int		ret;
+	char	*buf;
+	char	*new;
+
+	buf = ft_strnew(8);
+	ret = read(0, buf, 8);
+	if (ret == -1)
+		return (-1);
+	if (ret == 0)
+	{
+		if (*line)
+			return (2);
+		return (1);			
+	}
+	if (!(new = ft_strjoin(*line, buf)))
+		return (-1);
+	free(*line);
+	free(buf);
+	*line = new;
+	return (0);
+}
+
+int		read_next_line(char **line)
+{
+	int ret;
+
+	ret = 1;
+	if (!line)
+		return (-1);
+	if (*line)
+		ft_strclr(*line);
+	while (ret)
+	{
+		if ((ret = read_next_char(line)) == -1)
+			return (-1);
+		if (!(ft_strchr(*line, '\n')))
+			ret = 1;
+	}
+	return (1);
+}
+
+int		process_key(char *key)
 {
 	int	x;
 
 	x = 0;
-//	if (key[0] != 10)
-		ft_putstr(key);
 	if (key[0] == 27)
 	{
 		free(key);
-		return (ft_strnew(1));
+		return (0);
 	}
+	ft_putstr(key);
 /*	while (key[x])
 	{
 		if (x)
@@ -69,5 +111,5 @@ char	*process_key(char *key)
 		x++;
 	}
 	ft_putstr("\n");*/
-	return (key);
+	return (0);
 }

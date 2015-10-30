@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 13:45:00 by anowak            #+#    #+#              #
-#    Updated: 2015/10/29 14:26:57 by anowak           ###   ########.fr        #
+#    Updated: 2015/10/30 15:42:17 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -107,8 +107,7 @@ SRC =		ft_memset.c				\
 			ft_isparenthesis.c		\
 			ft_toclosingparenthesis.c		\
 			get_next_line.c			\
-			get_next_line_singlefd.c\
-			get_next_line_charbychar.c
+			get_next_line_singlefd.c
 
 OBJ_DIR =	objects
 OBJ =		$(SRC:.c=.o)

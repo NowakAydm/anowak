@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 11:59:53 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/14 16:08:59 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 17:10:53 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int		get_str(t_list *cur, char **line)
+static int		get_str(t_list *cur, char **line)
 {
 	t_list	*tmp;
 
@@ -31,7 +31,7 @@ int		get_str(t_list *cur, char **line)
 	return (2);
 }
 
-int		read_next_line(int fd, t_list *cur, char **line)
+static int		read_next_line(int fd, t_list *cur, char **line)
 {
 	char	*buf;
 	char	*new;
@@ -59,7 +59,7 @@ int		read_next_line(int fd, t_list *cur, char **line)
 	return (0);
 }
 
-int		get_next_line_singlefd(int const fd, char **line)
+int				get_next_line_singlefd(int const fd, char **line)
 {
 	t_list			*list;
 	int				ret;

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/03 11:50:17 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 15:02:05 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 15:42:27 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,6 @@ void		ft_btree_free(t_btree *root);
 **			Fonctions perso
 */
 
-int			get_next_line_charbychar(int const fd, char **line, char *f(char*));
 int			get_next_line_singlefd(int const fd, char **line);
 int			get_next_line(int const fd, char **line);
 
