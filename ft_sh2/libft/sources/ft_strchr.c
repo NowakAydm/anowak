@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/06 15:09:33 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/12 18:28:21 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 19:13:10 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,19 @@ char	*ft_strchr(const char *s, int c)
 {
 	unsigned char *r;
 
-	r = (unsigned char *)s;
-	while (*r)
+	if (s)
 	{
-		if (*r == c)
+		r = (unsigned char *)s;
+		while (*r)
+		{
+			if (*r == c)
+				return ((char *)r);
+			r++;
+		}
+		if (c == 0)
 			return ((char *)r);
-		r++;
+		else
+			return (NULL);
 	}
-	if (c == 0)
-		return ((char *)r);
-	else
-		return (NULL);
+	return (NULL);
 }

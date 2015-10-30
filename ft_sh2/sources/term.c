@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/30 17:29:02 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 19:11:19 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,14 @@ int		read_next_char(char **line)
 			return (2);
 		return (1);			
 	}
-	if (!(new = ft_strjoin(*line, buf)))
-		return (-1);
-	free(*line);
+	if (process_key(buf))
+	{
+		if (!(new = ft_strjoin(*line, buf)))
+			return (-1);
+		free(*line);
+		*line = new;
+	}
 	free(buf);
-	*line = new;
 	return (0);
 }
 
@@ -97,19 +100,9 @@ int		process_key(char *key)
 	int	x;
 
 	x = 0;
-	if (key[0] == 27)
-	{
-		free(key);
-		return (0);
-	}
+	if (key)
+		if (key[0] == 27)
+			return (0);
 	ft_putstr(key);
-/*	while (key[x])
-	{
-		if (x)
-			ft_putstr(" - ");
-		ft_putnbr(key[x]);
-		x++;
-	}
-	ft_putstr("\n");*/
-	return (0);
+	return (1);
 }
