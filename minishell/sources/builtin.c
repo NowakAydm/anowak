@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:31:30 by anowak            #+#    #+#             */
-/*   Updated: 2015/09/17 14:32:45 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 16:06:00 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ int	execute_builtin(t_cmd *cmd, char ***envp)
 	}
 	return (0);
 }
-
-// TODO : CORRIGER OLDPWD ET PWD DANS CD
 
 int	check_builtin(t_cmd *cmd)
 {

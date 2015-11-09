@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/02/16 01:23:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/05/04 19:30:00 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 19:13:20 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-unsigned long long ft_abs(long long n)
+unsigned long long	ft_abs(long long n)
 {
 	return ((n > 0 ? n : -n));
 }

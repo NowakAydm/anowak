@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/11 20:46:31 by anowak            #+#    #+#             */
-/*   Updated: 2014/12/11 20:47:10 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 19:14:02 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void ft_putnbrendl(int nb)
+void	ft_putnbrendl(int nb)
 {
 	if (nb < 0)
 	{

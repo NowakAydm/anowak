@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:10:57 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/26 17:13:06 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 16:32:24 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@ int		ft_toclosingparenthesis(int c)
 	if (c == '(')
 		return (')');
 	else if (c == '[')
-		return ('[');
+		return (']');
 	else if (c == '{')
 		return ('}');
 	else

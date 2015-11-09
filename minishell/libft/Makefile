@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 13:45:00 by anowak            #+#    #+#              #
-#    Updated: 2015/10/29 14:26:57 by anowak           ###   ########.fr        #
+#    Updated: 2015/10/30 14:26:30 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -107,8 +107,7 @@ SRC =		ft_memset.c				\
 			ft_isparenthesis.c		\
 			ft_toclosingparenthesis.c		\
 			get_next_line.c			\
-			get_next_line_singlefd.c\
-			get_next_line_charbychar.c
+			get_next_line_singlefd.c
 
 OBJ_DIR =	objects
 OBJ =		$(SRC:.c=.o)
@@ -119,9 +118,9 @@ $(NAME) :
 	@echo "\033[31m/==================================\\"
 	@echo "\033[31m|        \033[33mCreation of libft         \033[31m|"
 	@echo "\033[31m\\==================================/"
-	@echo "\033[31m|\033[33m - Compilation of source files    \033[31m|\033[0m"
+	@echo "\033[31m|\033[33m  - Compilation of source files   \033[31m|\033[0m"
 	@make $(OBJ)
-	@echo "\033[31m|\033[33m - Creation of libft.a            \033[31m|\033[0m"
+	@echo "\033[31m|\033[33m  - Creation of libft.a           \033[31m|\033[0m"
 	@ar rc $(NAME) $(addprefix $(OBJ_DIR)/, $(OBJ))
 	@ranlib $(NAME)
 	@echo "\033[31mx============= \033[32mDONE ! \033[31m=============x\033[0m"

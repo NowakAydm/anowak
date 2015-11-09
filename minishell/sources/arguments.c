@@ -6,51 +6,36 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/14 19:58:22 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 18:37:49 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-int		argument_is_in_quotes(char *line, t_list **list, int x)
+int		add_argument_to_list(char *line, t_list **list, int x, int y)
 {
 	char	*str;
-	int		y;
-	int		z;
 
-	z = 0;
-	if (line[x] == '<' || line[x] == '>')
+	if (ft_isquote(line[x + y]))
+		return (argument_is_in_quotes(line, list, x));
+	while (line[x + y] && !(ft_isspace(line[x + y]))
+			&& !(ft_isquote(line[x + y]))
+			&& !(ft_strchr("|;<>", line[x + y])))
+		if (line[x + y++] == '\\')
+			y++;
+	if (y)
 	{
-		z++;
-		if (line[x + z])
-			if (line[x + z] == '<' || line[x + z] == '>')
-				z++;
-		while (ft_isspace(line[x + z]))
-			z++;
-	}
-
-	if (!(y = dist_to_next_quote(line + x + z, line[x + z])))
-		return (0);
-	else if (y == 1)
-	{
-		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
-		return (x + z + 2);
-	}
-	else
-	{
-		if (!(str = ft_strndup(line + x, y + z)))
+		str = ft_strndup((line + x), y);
+		if (!(str = remove_char(str, '\\')))
 			return (0);
-		str = remove_char(str, line[x + z]);
 		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
 		free(str);
-		y++;
 	}
-	return (x + y + z);
+	return (x + y);
 }
 
 int		argument_not_in_quotes(char *line, t_list **list, int x)
 {
-	char	*str;
 	int		y;
 
 	y = 0;
@@ -75,42 +60,7 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 	}
 	else if (arg_is_fd_redirector(line + x))
 		y += 4;
-
-	if (ft_isquote(line[x + y]))
-		return (argument_is_in_quotes(line, list, x));
-
-	while (line[x + y] && !(ft_isspace(line[x + y]))
-		   && !(ft_isquote(line[x + y]))
-		   && !(ft_strchr("|;<>", line[x + y])))
-		if (line[x + y++] == '\\')
-			y++;
-	if (y)
-	{
-		str = ft_strndup((line + x), y);
-		if (!(str = remove_char(str, '\\')))
-			return (0);
-		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
-		free(str);
-	}
-	return (x + y);
-}
-
-int		arg_is_fd_redirector(char *arg)
-{
-	int x;
-
-	x = 0;
-	if (!arg)
-		return (0);
-	while (ft_isspace(arg[x]))
-		   x++;
-	if (ft_isdigit(arg[x]))
-		x++;
-	if (x && ft_strcmp(arg + 1 ,">&") == '-')
-		return (1);
-	if (x && ft_isdigit(ft_strcmp(arg + 1 ,">&")))
-		return (1);
-	return (0);
+	return (add_argument_to_list(line, list, x, y));
 }
 
 char	*remove_char(char *str, char c)
@@ -118,9 +68,9 @@ char	*remove_char(char *str, char c)
 	char	*new;
 	char	*spot;
 
-	if (ft_strchr(str, c))
+	if (ft_strchr(str + 1, c))
 	{
-		new = ft_strdup(str);
+		new = ft_strdup(str + 1);
 		while ((spot = ft_strchr(new, c)))
 		{
 			*spot = '\0';
@@ -129,7 +79,6 @@ char	*remove_char(char *str, char c)
 		}
 		spot = ft_strdup(new);
 		free(new);
-		free(str);
 		return (spot);
 	}
 	return (str);

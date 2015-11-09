@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_minishell2.c                                    :+:      :+:    :+:   */
+/*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/07/16 17:01:46 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/28 16:12:46 by AdamNowak        ###   ########.fr       */
+/*   Created: 2015/10/29 17:10:08 by anowak            #+#    #+#             */
+/*   Updated: 2015/10/29 19:05:34 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	increment_shlvl(char ***env)
 {
 	int		n;
 	char	**str;
-	
+
 	if (get_in_env(*env, "SHLVL"))
 	{
 		n = ft_atoi(get_in_env(*env, "SHLVL"));
@@ -62,8 +62,6 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 	sh = ft_memalloc(sizeof(t_ftsh));
 	if (sh)
 	{
-		if (initialize_term(sh, envp) == -1)
-			return (NULL);
 		sh->prompt = ft_strdup(PROMPT);
 		if (!(sh->prompt))
 			return (NULL);
@@ -85,7 +83,6 @@ int		main(int argc, char **argv, char **envp)
 {
 	t_ftsh	*sh;
 
-	ft_putendl("____----    FT_MINISHELL2    ----____");
 	sh = NULL;
 	sh = intialize_sh(argc, argv, envp);
 	if (!sh)
@@ -107,9 +104,6 @@ int		main(int argc, char **argv, char **envp)
 			sh->path_dir = extract_path_directories(sh->env_dup);
 		}
 		else
-		{
-			restore_term(NULL);
 			exit(1);
-		}
 	}
 }
