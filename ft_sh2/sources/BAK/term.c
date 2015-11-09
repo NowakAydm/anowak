@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/09 22:04:23 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/30 19:11:19 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,8 @@ void	restore_term(struct termios *term_bak)
 
 	if (term_bak)
 		term = term_bak;
-	else if (term)
-		tcsetattr(0, TCSAFLUSH, term);
+	else
+		tcsetattr(0, TCSANOW, term);
 }
 
 int		initialize_term(t_ftsh *sh, char **envp)
@@ -43,7 +43,7 @@ int		initialize_term(t_ftsh *sh, char **envp)
 		(sh->term)->c_lflag &= ~(ECHO);
 		(sh->term)->c_cc[VMIN] = 1;
 		(sh->term)->c_cc[VTIME] = 0;
-		tcsetattr(0, TCSAFLUSH, sh->term);
+		tcsetattr(0, TCSADRAIN, sh->term);
 		return (0);
 	}
 	return (-1);

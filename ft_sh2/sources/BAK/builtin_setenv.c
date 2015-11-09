@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:30:35 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 16:12:24 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 18:39:23 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,14 +81,16 @@ int			builtin_setenv(char **av, char ***env)
 	int		ret;
 
 	x = 0;
+	ret = 0;
 	if (ft_tablen(av) == 1)
 	{
 		ft_putendl_fd("Error : not enough arguments to setenv", 2);
 		return (1);
 	}
 	while (av[++x])
-		if (ft_strchr(av[x], '=') && *(ft_strchr(av[x], '=') + 1) && av[x][0]
-			&& (av[x] = change_into_number(av[x])) && av[x][0] != '=')
+		if (ft_strchr(av[x], '=') && *(ft_strchr(av[x], '=') + 1)
+			&& (av[x] = change_into_number(av[x]))
+			&& av[x][0] && av[x][0] != '=')
 		{
 			if ((ret = check_if_in_env(av[x], *env)) >= 0)
 			{

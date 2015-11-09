@@ -6,61 +6,33 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 19:42:06 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/26 17:16:06 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/29 19:07:32 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-int		check_parenthesis(char *line)
+int		argument_is_in_quotes(char *line, t_list **list, int x)
 {
-	int		x;
-	int		ret;
-
-	x = -1;
-	while (line[++x])
-	{
-		if (line[x] == '(' || line[x] == '[' || line[x] == '{')
-		{
-			ret = line[x++];
-			while (line[x] && line[x] != ft_toclosingparenthesis(ret))
-				if (line[x++] == '\\')
-					x++;
-			if (!(line[x]))
-				return (write(1, "> ", 2));
-			else
-				ret = 0;
-		}
-		else if (line[x] == '\\')
-			if (!(line[++x]))
-				return ((write(1, "> ", 2) ? 1 : 1));
-	}	
-	return (ret);
-}
-
-int		check_pipe(char *line)
-{
-	int		x;
-	int		ret;
 	char	*str;
+	int		y;
 
-	x = -1;
-	ret = 0;
-	str = NULL;
-	if ((str = ft_strchr(line, '|')))
+	if (!(y = dist_to_next_quote(line + x, line[x])))
+		return (0);
+	else if (y == 1)
 	{
-		while (str[++x])
-		{
-			while (ft_isspace(str[x]))
-				   x++;
-			if ((ft_isquote(str[x]) && str[x] != str[x + 1])
-				|| !(ft_strchr("'\"`;|><", str[x])))
-				return (0);
-		}
-		if (!str[x])
-			return (write(1, "pipe> ", 6));
+		ft_lstaddend(list, ft_lstnew(ft_strdup(""), 1));
+		return (x + 2);
 	}
-	return (ret);
+	else
+	{
+		if (!(str = ft_strndup(line + x, y + 1)))
+			return (0);
+		ft_lstaddend(list, ft_lstnew(str, ft_strlen(str) + 1));
+		free(str);
+		y++;
+	}
+	return (x + y);
 }
 
 int		prompt_missing_quote(int ret)
@@ -71,33 +43,6 @@ int		prompt_missing_quote(int ret)
 		write(1, "quote> ", 8);
 	else if (ret == '`')
 		write(1, "bquote> ", 9);
-	return (ret);
-}
-
-int		check_quotes_in_line(char *line)
-{
-	int	x;
-	int	ret;
-
-	x = -1;
-	ret = 0;
-	while (line[++x])
-	{
-		if (line[x] == '\'' || line[x] == '"' || line[x] == '`')
-		{
-			ret = line[x++];
-			while (line[x] && line[x] != ret)
-				if (line[x++] == '\\')
-					x++;
-			if (!(line[x]))
-				return (prompt_missing_quote(ret));
-			else
-				ret = 0;
-		}
-		else if (line[x] == '\\')
-			if (!(line[++x]))
-				return ((write(1, "> ", 2) ? 1 : 1));
-	}
 	return (ret);
 }
 
@@ -115,4 +60,31 @@ int		dist_to_next_quote(char *line, int c)
 		return (0);
 	}
 	return (y);
+}
+
+int		find_path_to_command(t_cmd *new, char **path_dir)
+{
+	int	x;
+
+	x = -1;
+	if (!(new->path = ft_strnew(MAXPATHLEN)))
+		return (0);
+	if (new->argv[0][0] == '.' || new->argv[0][0] == '/')
+	{
+		ft_strcpy(new->path, new->argv[0]);
+		return (check_permissions(new->path));
+	}
+	else if (path_dir)
+	{
+		while (path_dir[++x])
+		{
+			ft_strcpy(new->path, path_dir[x]);
+			ft_strcat(new->path, "/");
+			ft_strcat(new->path, new->argv[0]);
+			if (check_permissions(new->path) != -1)
+				return (check_permissions(new->path));
+			ft_strclr(new->path);
+		}
+	}
+	return (-1);
 }

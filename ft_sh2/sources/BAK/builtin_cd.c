@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/26 16:27:32 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/30 14:38:46 by anowak           ###   ########.fr       */
+/*   Updated: 2015/09/17 15:35:02 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,10 +80,7 @@ static char	*get_destination(char **av, char ***envp)
 	else if (len == 2)
 	{
 		if (!strcmp(av[1], "-"))
-		{
-			if (!(path = get_in_env(*envp, "OLDPWD")))
-				ft_putendl_fd("Error : could'nt find OLDPWD", 2);
-		}
+			path = get_in_env(*envp, "OLDPWD");
 		else
 			path = av[1];
 	}
@@ -96,8 +93,6 @@ int			builtin_cd(char **av, char ***envp)
 {
 	char	*path;
 
-	if (!(get_in_env(*envp, "PWD")))
-		change_env_pwd(envp);
 	path = get_destination(av, envp);
 	if (path)
 	{

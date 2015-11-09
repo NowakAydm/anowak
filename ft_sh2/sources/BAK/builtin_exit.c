@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 18:14:26 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/09 21:51:15 by anowak           ###   ########.fr       */
+/*   Updated: 2015/10/28 14:56:25 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,16 @@ int	builtin_exit(int ac, char **av)
 {
 	if (ac < 2)
 	{
+		ft_putendl("Exiting ft_minishell2 ... See you later .)");
 		restore_term(NULL);
-		while (1)
-			exit(0);
+		exit(0);
 	}
 	if (ac == 2)
 	{
 		if (ft_atoi(av[1]))
 		{
 			restore_term(NULL);
-			while (1)
-				exit(ft_atoi(av[1]));
+			exit(ft_atoi(av[1]));
 		}
 		else
 			ft_putendl_fd("Error : argument is not a number", 2);
