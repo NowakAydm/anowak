@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/09 22:04:23 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/10 17:03:23 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ void	restore_term(struct termios *term_bak)
 	if (term_bak)
 		term = term_bak;
 	else if (term)
-		tcsetattr(0, TCSAFLUSH, term);
+	{
+		ft_putendl("TERMINAL RESTORED");
+		tcsetattr(0, TCSADRAIN, term);
+	}
 }
 
 int		initialize_term(t_ftsh *sh, char **envp)
@@ -41,9 +44,11 @@ int		initialize_term(t_ftsh *sh, char **envp)
 		restore_term(sh->term_bak);
 		(sh->term)->c_lflag &= ~(ICANON);
 		(sh->term)->c_lflag &= ~(ECHO);
+		(sh->term)->c_lflag &= ~(ECHOE);
+//		(sh->term)->c_iflag &= ~(ICRNL);
 		(sh->term)->c_cc[VMIN] = 1;
 		(sh->term)->c_cc[VTIME] = 0;
-		tcsetattr(0, TCSAFLUSH, sh->term);
+		tcsetattr(0, TCSADRAIN, sh->term);
 		return (0);
 	}
 	return (-1);
@@ -97,12 +102,31 @@ int		read_next_line(char **line)
 
 int		process_key(char *key)
 {
-	int	x;
+	int		x;
+//	char	*new;
 
+/*	x = 0;
+	ft_putnbr(key[x]);
+	while (key[++x])
+	{
+		ft_putstr(" - ");
+		ft_putnbr(key[x]);
+	}
+*/
 	x = 0;
-	if (key)
-		if (key[0] == 27)
-			return (0);
-	ft_putstr(key);
+	if (!key)
+		return (0);
+	if (key[0] == 27)
+		return (0);
+//	else if (key[0] == 127)
+//	{
+/*		*line[ft_strlen(*line) - 1] = 0;
+		new = ft_strdup(*line);
+		free(*line);
+		*line = new;
+		*///		return (0);
+//	}
+	else
+		ft_putstr(key);
 	return (1);
 }

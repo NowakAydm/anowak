@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 16:18:11 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 18:18:25 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/10 18:15:59 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,14 @@ int		get_heredoc(t_cmd *cmd)
 		ft_putendl_fd("Error : can't catch signal", 2);
 	while (ft_strcmp(line, cmd->heredoc) != 0)
 	{
-		ft_putstr("heredoc > ");
-		ret = get_next_line_singlefd(0, &line);
+		ft_putstr("heredoc ('");
+		ft_putstr(cmd->heredoc);
+		ft_putstr("') > ");
+		ret = read_next_line(&line);
 		len = ft_strlen(line);
 		if (ret == -1)
 			return (-1);
+		printf("STRCMP - %s - %s == %d\n", line, cmd->heredoc, ft_strcmp(line, cmd->heredoc));
 		if (ft_strcmp(line, cmd->heredoc) != 0)
 			ft_lstaddend(&(cmd->heredoc_list), ft_lstnew(line, len));
 	}
