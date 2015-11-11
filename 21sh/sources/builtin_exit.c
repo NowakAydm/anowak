@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 18:14:26 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/10 17:04:21 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/11 22:32:26 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int	builtin_exit(int ac, char **av)
 {
-	sleep(1);
 	if (ac < 2)
 	{
 		restore_term(NULL);

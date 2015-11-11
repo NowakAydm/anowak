@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/10 17:03:23 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/11 23:04:46 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,17 @@
 
 void	restore_term(struct termios *term_bak)
 {
-	static struct termios *term;
+	static struct termios	*term;
+	static unsigned long	a;
 
 	if (term_bak)
+	{
 		term = term_bak;
+		a = term_bak->c_lflag;
+	}
 	else if (term)
 	{
-		ft_putendl("TERMINAL RESTORED");
+		term->c_lflag = a;
 		tcsetattr(0, TCSADRAIN, term);
 	}
 }
@@ -44,8 +48,6 @@ int		initialize_term(t_ftsh *sh, char **envp)
 		restore_term(sh->term_bak);
 		(sh->term)->c_lflag &= ~(ICANON);
 		(sh->term)->c_lflag &= ~(ECHO);
-		(sh->term)->c_lflag &= ~(ECHOE);
-//		(sh->term)->c_iflag &= ~(ICRNL);
 		(sh->term)->c_cc[VMIN] = 1;
 		(sh->term)->c_cc[VTIME] = 0;
 		tcsetattr(0, TCSADRAIN, sh->term);
@@ -54,12 +56,13 @@ int		initialize_term(t_ftsh *sh, char **envp)
 	return (-1);
 }
 
-int		read_next_char(char **line)
+int		read_next_char(char **line, int *pos)
 {
 	int		ret;
 	char	*buf;
 	char	*new;
 
+//	printf("POS %d - %d\n", pos[0], pos[1]);
 	buf = ft_strnew(8);
 	ret = read(0, buf, 8);
 	if (ret == -1)
@@ -70,7 +73,7 @@ int		read_next_char(char **line)
 			return (2);
 		return (1);			
 	}
-	if (process_key(buf))
+	if (process_key(buf, line, pos))
 	{
 		if (!(new = ft_strjoin(*line, buf)))
 			return (-1);
@@ -84,7 +87,9 @@ int		read_next_char(char **line)
 int		read_next_line(char **line)
 {
 	int ret;
+	int *pos;
 
+	pos = ft_memalloc(sizeof(int) *2);
 	ret = 1;
 	if (!line)
 		return (-1);
@@ -92,41 +97,67 @@ int		read_next_line(char **line)
 		ft_strclr(*line);
 	while (ret)
 	{
-		if ((ret = read_next_char(line)) == -1)
+		if ((ret = read_next_char(line, pos)) == -1)
+		{
+			free(pos);
 			return (-1);
+		}
 		if (!(ft_strchr(*line, '\n')))
 			ret = 1;
 	}
+	free(pos);
 	return (1);
 }
 
-int		process_key(char *key)
+int		process_special_key(char *key, int *pos, char **line)
 {
-	int		x;
-//	char	*new;
+	if (key[1] && key[2])
+		if (key[1] == 91)
+		{
+			if (key[2] == 67 && ft_strlen(*line) > (size_t)pos[0])
+			{
+				pos[0]++;
+				ft_putstr(tgetstr("nd", NULL));
+			}
+			if (key[2] == 68 && pos[0])
+			{
+				pos[0]--;
+				ft_putstr(tgetstr("le", NULL));
+			}
+		}
+	return (0);
+}
 
-/*	x = 0;
-	ft_putnbr(key[x]);
-	while (key[++x])
-	{
-		ft_putstr(" - ");
-		ft_putnbr(key[x]);
-	}
-*/
-	x = 0;
+int		delete_char(int **pos, char **line)
+{
+	char	*str;
+
+	str = *line;
+	if (!pos[0])
+		return (0);
+	ft_putstr(tgetstr("le", NULL));
+	ft_putstr(tgetstr("dm", NULL));
+	ft_putstr(tgetstr("dc", NULL));
+	ft_putstr(tgetstr("ed", NULL));
+// DELETE THE THINGS
+	str[*pos[0] - 1] = '!';
+	pos[0]--;
+	return (0);
+}
+
+int		process_key(char *key, char **line, int *pos)
+{
+	ft_putstr(tgetstr("im", NULL));
 	if (!key)
 		return (0);
 	if (key[0] == 27)
-		return (0);
-//	else if (key[0] == 127)
-//	{
-/*		*line[ft_strlen(*line) - 1] = 0;
-		new = ft_strdup(*line);
-		free(*line);
-		*line = new;
-		*///		return (0);
-//	}
-	else
-		ft_putstr(key);
+		return (process_special_key(key, pos, line));
+	else if (key[0] == 127)
+		return (delete_char(&pos, line));
+	ft_putstr(tgetstr("ic", NULL));
+	ft_putstr(key);
+	ft_putstr(tgetstr("ip", NULL));
+	ft_putstr(tgetstr("ei", NULL));
+	pos[0]++;
 	return (1);
 }

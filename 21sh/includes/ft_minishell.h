@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/10 16:58:00 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/11 22:53:13 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,9 +132,9 @@ int		find_path_to_command(t_cmd *new, char **path_dir);
 */
 void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
-int		read_next_char(char **line);
+int		read_next_char(char **line, int *pos);
 int		read_next_line(char **line);
-int		process_key(char *key);
+int		process_key(char *key, char **line, int *pos);
 
 /*
 ** -------      builtins.c     --------
