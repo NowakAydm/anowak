@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/03 11:50:17 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/30 15:42:27 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/12 19:13:51 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ char		*ft_strndup(const char *s1, size_t n);
 char		*ft_strcdup(const char *s1, char c);
 int			ft_count_words(char *s, char c);
 int			ft_nbrlen(int n);
+char		*ft_strdelchar(char *s, int n);
+char		*ft_strinsert(char *s, char c, int n);
 char		*ft_strrev(char *s);
 int			ft_isspace(int c);
 double		ft_puiss10(int c);

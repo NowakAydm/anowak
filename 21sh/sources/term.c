@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/11 23:04:46 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/12 20:14:47 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int		read_next_char(char **line, int *pos)
 {
 	int		ret;
 	char	*buf;
-	char	*new;
+//	char	*new;
 
 //	printf("POS %d - %d\n", pos[0], pos[1]);
 	buf = ft_strnew(8);
@@ -73,13 +73,14 @@ int		read_next_char(char **line, int *pos)
 			return (2);
 		return (1);			
 	}
-	if (process_key(buf, line, pos))
+	process_key(buf, line, pos);
+/*	if (process_key(buf, line, pos))
 	{
 		if (!(new = ft_strjoin(*line, buf)))
 			return (-1);
 		free(*line);
 		*line = new;
-	}
+		}*/
 	free(buf);
 	return (0);
 }
@@ -133,15 +134,16 @@ int		delete_char(int **pos, char **line)
 	char	*str;
 
 	str = *line;
-	if (!pos[0])
+	if (*pos[0] == 0)
 		return (0);
 	ft_putstr(tgetstr("le", NULL));
 	ft_putstr(tgetstr("dm", NULL));
 	ft_putstr(tgetstr("dc", NULL));
 	ft_putstr(tgetstr("ed", NULL));
+	*line = ft_strdelchar(*line, *pos[0] - 1);
 // DELETE THE THINGS
-	str[*pos[0] - 1] = '!';
-	pos[0]--;
+//	str[*pos[0] - 1] = '!';
+	*pos[0] = **pos -1;
 	return (0);
 }
 
@@ -150,7 +152,15 @@ int		process_key(char *key, char **line, int *pos)
 	ft_putstr(tgetstr("im", NULL));
 	if (!key)
 		return (0);
-	if (key[0] == 27)
+	if (key[0] == 10)
+	{
+		*line = ft_strinsert(*line, *key, ft_strlen(*line));
+		ft_putstr(key);
+		ft_putstr(tgetstr("ei", NULL));
+		pos[0]++;
+		return (1);
+	}
+	else if (key[0] == 27)
 		return (process_special_key(key, pos, line));
 	else if (key[0] == 127)
 		return (delete_char(&pos, line));
@@ -158,6 +168,7 @@ int		process_key(char *key, char **line, int *pos)
 	ft_putstr(key);
 	ft_putstr(tgetstr("ip", NULL));
 	ft_putstr(tgetstr("ei", NULL));
+	*line = ft_strinsert(*line, *key, pos[0]);
 	pos[0]++;
-	return (1);
+	return (0);
 }

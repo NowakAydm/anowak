@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 13:45:00 by anowak            #+#    #+#              #
-#    Updated: 2015/10/30 15:42:17 by anowak           ###   ########.fr        #
+#    Updated: 2015/11/12 19:12:16 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -104,6 +104,8 @@ SRC =		ft_memset.c				\
 			ft_isquote.c			\
 			ft_tabdup.c				\
 			ft_tabadd.c				\
+			ft_strdelchar.c			\
+			ft_strinsert.c			\
 			ft_isparenthesis.c		\
 			ft_toclosingparenthesis.c		\
 			get_next_line.c			\
