@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 19:12:34 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/12 20:08:00 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/19 16:41:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,21 @@
 char *ft_strinsert(char *str, char c, int n)
 {
 	char *new;
-	char *cha;
 	char *end;
 
 	new = NULL;
-	cha = ft_strnew(1);
-	*cha = c;
 	if (str)
 		if (n <= (int)ft_strlen(str))
 		{
-			if (!(new = ft_strnew(ft_strlen(str + 1))))
-				return (NULL);
 			end = ft_strdup(str + n);
+			if (!(new = ft_strnew(ft_strlen(str) + 1)))
+				return (NULL);
 			ft_strncpy(new, str, n);
-			ft_strcat(new, cha);
-			ft_strcat(new, end);
+			new[n] = c;
+			if (end)
+				ft_strcat(new, end);
 			free(end);
-			free(str);
-			free(cha);
 			return (new);
 		}
-	return (cha);
+	return (ft_strndup(&c, 1));
 }

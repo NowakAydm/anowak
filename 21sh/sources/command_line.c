@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/09 21:40:23 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/19 16:38:44 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ char	*get_command_line(void)
 	ret = 1;
 	while ((ret = read_next_line(&line)) != 0)
 	{
+		if (!line)
+			return (NULL);
 		if (ret == -1)
 		{
 			if (tmp)

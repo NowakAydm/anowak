@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/12 20:14:47 by anowak           ###   ########.fr       */
+/*   Updated: 2015/11/19 17:57:38 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,24 +63,21 @@ int		read_next_char(char **line, int *pos)
 //	char	*new;
 
 //	printf("POS %d - %d\n", pos[0], pos[1]);
-	buf = ft_strnew(8);
+	if (!(buf = ft_strnew(8)))
+		return (-1);
 	ret = read(0, buf, 8);
 	if (ret == -1)
 		return (-1);
 	if (ret == 0)
 	{
+		free(buf);
 		if (*line)
 			return (2);
 		return (1);			
 	}
 	process_key(buf, line, pos);
-/*	if (process_key(buf, line, pos))
-	{
-		if (!(new = ft_strjoin(*line, buf)))
-			return (-1);
-		free(*line);
-		*line = new;
-		}*/
+	if (!*line)
+		return (-1);
 	free(buf);
 	return (0);
 }
@@ -110,22 +107,47 @@ int		read_next_line(char **line)
 	return (1);
 }
 
-int		process_special_key(char *key, int *pos, char **line)
+int		ft_outc(int c)
 {
-	if (key[1] && key[2])
-		if (key[1] == 91)
-		{
-			if (key[2] == 67 && ft_strlen(*line) > (size_t)pos[0])
-			{
-				pos[0]++;
-				ft_putstr(tgetstr("nd", NULL));
-			}
-			if (key[2] == 68 && pos[0])
-			{
-				pos[0]--;
-				ft_putstr(tgetstr("le", NULL));
-			}
-		}
+	if (!ft_isascii(c))
+		return (0);
+	if (write(1, &c, 1))
+		return (1);
+	else
+		return (0);
+}
+
+void	blblbl(char *str)
+{
+	int x = 0;
+
+	while (str[x])
+	{
+		if (x)
+			ft_putstr(" - ");
+		ft_putnbr(str[x++]);
+	}
+}
+
+int		process_special_key(char *key, int *pos, char **line)
+{	
+	ft_putstr("key : ");
+	blblbl(key);
+	ft_putstr(" | left : ");
+	blblbl(tgetstr("kl", NULL));
+	ft_putstr(" | right : ");
+	blblbl(tgetstr("kr", NULL));
+	ft_putendl("");
+	if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line) > (size_t)pos[0])
+	{
+		pos[0]++;
+		tputs(tgetstr("nd", NULL), 0, ft_outc);
+	}
+	if (!ft_strcmp(key, tgetstr("kl", NULL)) && pos[0])
+	{
+		pos[0]--;
+		tputs(tgetstr("le", NULL), 0, ft_outc);
+	}
 	return (0);
 }
 
@@ -136,27 +158,27 @@ int		delete_char(int **pos, char **line)
 	str = *line;
 	if (*pos[0] == 0)
 		return (0);
-	ft_putstr(tgetstr("le", NULL));
-	ft_putstr(tgetstr("dm", NULL));
-	ft_putstr(tgetstr("dc", NULL));
-	ft_putstr(tgetstr("ed", NULL));
-	*line = ft_strdelchar(*line, *pos[0] - 1);
+	tputs(tgetstr("le", NULL), 0, ft_outc);
+	tputs(tgetstr("dm", NULL), 0, ft_outc);
+	tputs(tgetstr("dc", NULL), 0, ft_outc);
+	tputs(tgetstr("ed", NULL), 0, ft_outc);
+	*pos[0] = **pos -1;
+	*line = ft_strdelchar(*line, *pos[0]);
 // DELETE THE THINGS
 //	str[*pos[0] - 1] = '!';
-	*pos[0] = **pos -1;
 	return (0);
 }
 
 int		process_key(char *key, char **line, int *pos)
 {
-	ft_putstr(tgetstr("im", NULL));
 	if (!key)
 		return (0);
+	ft_putstr(tgetstr("im", NULL));
 	if (key[0] == 10)
 	{
 		*line = ft_strinsert(*line, *key, ft_strlen(*line));
 		ft_putstr(key);
-		ft_putstr(tgetstr("ei", NULL));
+		tputs(tgetstr("ei", NULL), 0, ft_outc);
 		pos[0]++;
 		return (1);
 	}
@@ -164,11 +186,11 @@ int		process_key(char *key, char **line, int *pos)
 		return (process_special_key(key, pos, line));
 	else if (key[0] == 127)
 		return (delete_char(&pos, line));
-	ft_putstr(tgetstr("ic", NULL));
-	ft_putstr(key);
-	ft_putstr(tgetstr("ip", NULL));
-	ft_putstr(tgetstr("ei", NULL));
 	*line = ft_strinsert(*line, *key, pos[0]);
+	tputs(tgetstr("ic", NULL), 0, ft_outc);
+	ft_outc(*key);
+	tputs(tgetstr("ip", NULL), 0, ft_outc);
+	tputs(tgetstr("ei", NULL), 0, ft_outc);
 	pos[0]++;
 	return (0);
 }
