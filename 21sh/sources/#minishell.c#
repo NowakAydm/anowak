@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 17:10:08 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 14:18:05 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/11/09 21:31:03 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,8 +101,7 @@ int		main(int argc, char **argv, char **envp)
 		write(1, sh->prompt, ft_strlen(sh->prompt));
 		if ((sh->line = get_command_line()) != NULL)
 		{
-			ft_putendl("NEW LINE");
-			ft_putendl(sh->line);
+			
 			sh->ret = execute_command_line(sh, &(sh->env_dup));
 			ft_tabfree(sh->path_dir);
 			sh->path_dir = extract_path_directories(sh->env_dup);

@@ -6,46 +6,11 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 18:36:23 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/12/03 14:08:43 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	write_to_history(char *str, char ***env)
-{
-	int	fd;
-	char *path;
-
-	if (str)
-	{
-		path = ft_strnew(ft_strlen("~/.zshrc_history") + ft_strlen(get_in_env(*env, "HOME")));
-		ft_strcat(path, get_in_env(*env, "HOME"));
-		ft_strcat(path, "/.zshrc_history");
-		ft_putendl(path);
-
-		if ((fd = open(path, O_WRONLY | O_CREAT | O_APPEND , 0644)) == -1)
-			ft_putendl_fd("Error: Open failed", 2);
-		else
-		{
-			ft_putstr_fd("Open - fd= ", 2);
-			ft_putnbr_fd(fd, 2);
-			ft_putendl_fd(" ", 2);
-		}
-		ft_putendl("WRITING TO HISTORY");
-		ft_putstr_fd(": ", fd);
-		ft_putnbr_fd(time(NULL), fd);
-		ft_putstr_fd(":0;", fd);
-		ft_putendl_fd(str, fd);
-//		write(fd, str, ft_strlen(str));
-		close(fd);
-		free(path);
-	}
-	else
-		ft_putendl_fd("Error: couldn't write to history", 2);
-
-
-}
 
 void	restore_term(struct termios *term_bak)
 {
@@ -138,7 +103,6 @@ int		read_next_line(char **line)
 		if (!(ft_strchr(*line, '\n')))
 			ret = 1;
 	}
-	*(*line + ft_strlen(*line) - 1) = 0;
 	free(pos);
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 18:15:16 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/11/12 18:44:47 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 # include <signal.h>
 # include <unistd.h>
 # include <fcntl.h>
-# include <time.h>
 # include <termios.h>
 # include <curses.h>
 # include <term.h>
@@ -131,7 +130,6 @@ int		find_path_to_command(t_cmd *new, char **path_dir);
 /*
 ** -------      term.c     --------
 */
-void	write_to_history(char *str, char ***env);
 void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
 int		read_next_char(char **line, int *pos);

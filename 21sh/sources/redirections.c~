@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 16:18:11 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 15:09:49 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/11/10 18:15:59 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ int		get_heredoc(t_cmd *cmd)
 		len = ft_strlen(line);
 		if (ret == -1)
 			return (-1);
+		printf("STRCMP - %s - %s == %d\n", line, cmd->heredoc, ft_strcmp(line, cmd->heredoc));
 		if (ft_strcmp(line, cmd->heredoc) != 0)
 			ft_lstaddend(&(cmd->heredoc_list), ft_lstnew(line, len));
 	}
