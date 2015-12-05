@@ -1,8 +1,11 @@
 all : copy push
 
 copy :
-	cp ~/projects/STUFF/.emacs ~
-	cp ~/projects/STUFF/.zshrc ~
+	@cp -fv ~/projects/STUFF/.emacs ~
+	@cp -fv ~/projects/STUFF/.zshrc ~
+
+new :
+	sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 push :
 	@git status -s
