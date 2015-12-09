@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 17:10:08 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 14:18:05 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/12/09 18:39:52 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,18 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 	return (sh);
 }
 
+int	write_prompt(char **prompt)
+{
+	static char *str;
+	
+	if (prompt)
+		if (*prompt)
+			str = *prompt;
+	if (str)
+		ft_putstr(str);
+	return (ft_strlen(str));
+}
+
 int		main(int argc, char **argv, char **envp)
 {
 	t_ftsh	*sh;
@@ -90,7 +102,7 @@ int		main(int argc, char **argv, char **envp)
 	if (!sh)
 	{
 		ft_putendl_fd("Error : could'nt initialize shell", 2);
-		return (1);
+		exit(1);
 	}
 	while (1)
 	{
@@ -98,7 +110,7 @@ int		main(int argc, char **argv, char **envp)
 		if (sh->line)
 			free(sh->line);
 		sh->line = NULL;
-		write(1, sh->prompt, ft_strlen(sh->prompt));
+		write_prompt(&(sh->prompt));
 		if ((sh->line = get_command_line()) != NULL)
 		{
 			ft_putendl("NEW LINE");

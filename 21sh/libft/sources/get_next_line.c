@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/27 19:16:07 by anowak            #+#    #+#             */
-/*   Updated: 2015/07/14 11:59:39 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/09 19:40:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-t_list	*check_fd(int fd)
+t_list	*gnl_check_fd(int fd)
 {
 	static t_list	*list;
 	t_list			*tmp;
@@ -32,7 +32,7 @@ t_list	*check_fd(int fd)
 	return (new_lst->content);
 }
 
-int		get_str(t_list *cur, char **line)
+int		gnl_get_str(t_list *cur, char **line)
 {
 	t_list	*tmp;
 
@@ -51,7 +51,7 @@ int		get_str(t_list *cur, char **line)
 	return (2);
 }
 
-int		read_next_line(int fd, t_list *cur, char **line)
+int		gnl_read_next_line(int fd, t_list *cur, char **line)
 {
 	char	*buf;
 	int		ret;
@@ -85,12 +85,12 @@ int		get_next_line(int const fd, char **line)
 		return (-1);
 	if (*line)
 		ft_strclr(*line);
-	cur = check_fd(fd);
+	cur = gnl_check_fd(fd);
 	if (!cur)
 		return (-1);
-	while (!ret && !(ret = get_str(cur, line)))
+	while (!ret && !(ret = gnl_get_str(cur, line)))
 	{
-		ret = read_next_line(fd, cur, line);
+		ret = gnl_read_next_line(fd, cur, line);
 		if (ret == -1)
 			return (-1);
 	}

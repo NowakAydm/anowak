@@ -6,12 +6,13 @@
 ;    by: thor <thor@42.fr>                           +#+  +:+       +#+         ;
 ;                                                  +#+#+#+#+#+   +#+            ;
 ;    Created: 2013/06/18 14:01:14 by thor               #+#    #+#              ;
-;    Updated: 2015/10/12 15:02:22 by anowak           ###   ########.fr        ;
+;    Updated: 2015/12/09 17:44:20 by anowak           ###   ########.fr        ;
 ;                                                                               ;
 ;*******************************************************************************;
 
 ; Load general features files
-(setq config_files "/usr/share/emacs/site-lisp/")
+;(setq config_files "/usr/share/emacs/site-lisp/")
+(setq config_files "~/.emacs.d/lisp/")
 (setq load-path (append (list nil config_files) load-path))
 
 (load "list.el")
@@ -19,9 +20,13 @@
 (load "comments.el")
 (load "header.el")
 
+(setq config_files "/nfs/zfs-student-4/users/anowak/.emacs.d/lisp/")
+(setq load-path (append (list nil config_files) load-path))
+(load "highlight-chars.el")
+
 ; Set default emacs configuration
 (set-language-environment "UTF-8")
-(setq-default font-lock-global-modes nil)
+;(setq-default font-lock-global-modes nil)
 (setq-default line-number-mode nil)
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode t)
@@ -53,6 +58,9 @@
 (setq scroll-step            1
       scroll-conservatively  10000)
 
+;; Show colon number
+(column-number-mode 1)
+
 ;; Enable keypad support
 (global-set-key (kbd "<kp-0>") '"0")
 (global-set-key (kbd "<kp-1>") '"1")
@@ -81,10 +89,25 @@
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(gud-gdb-command-name "gdb --annotate=1")
- '(large-file-warning-threshold nil))
+ '(large-file-warning-threshold nil)
+ )
+
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(font-lock-comment-face ((((class color) (min-colors 8) (background light)) (:foreground "red")))))
+ '(font-lock-comment-face ((((class color) (min-colors 8) (background light)) (:foreground "red"))))
+ )
+
+;; turn on bracket match highlight
+(show-paren-mode 1)
+
+;; highlight stuff
+(require 'highlight-chars)
+(global-hi-lock-mode 1)
+(add-hook 'change-major-mode-hook
+		  '(lambda ()
+			(add-hook 'font-lock-mode-hook 'hc-highlight-trailing-whitespace)
+			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-hyphens)
+			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-spaces)))

@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/03 11:50:17 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/12 19:13:51 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/09 19:38:37 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 typedef unsigned long long	t_ulonglong;
 typedef t_btree				t_bt;
 
-# define BUFF_SIZE 8
+# define BUFF_SIZE 16
 
 /*
 **		Fonctions obl igatoires

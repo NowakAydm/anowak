@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 18:36:23 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/12/09 20:40:06 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	write_to_history(char *str, char ***env)
 	int	fd;
 	char *path;
 
-	if (str)
+	if (str && ft_strlen(str))
 	{
 		path = ft_strnew(ft_strlen("~/.zshrc_history") + ft_strlen(get_in_env(*env, "HOME")));
 		ft_strcat(path, get_in_env(*env, "HOME"));
@@ -32,19 +32,91 @@ void	write_to_history(char *str, char ***env)
 			ft_putnbr_fd(fd, 2);
 			ft_putendl_fd(" ", 2);
 		}
-		ft_putendl("WRITING TO HISTORY");
 		ft_putstr_fd(": ", fd);
 		ft_putnbr_fd(time(NULL), fd);
 		ft_putstr_fd(":0;", fd);
 		ft_putendl_fd(str, fd);
-//		write(fd, str, ft_strlen(str));
 		close(fd);
 		free(path);
 	}
+}
+
+char	**get_history(char **history)
+{
+	int		fd;
+	char	*line;
+	char	*path;
+	t_list	*list;
+	int		ret;
+	
+	line = ft_strnew(1);
+	list = NULL;
+	history = NULL;
+	ret = 1;
+	path = ft_strnew(ft_strlen("~/.zshrc_history") + ft_strlen(getenv("HOME")));
+	ft_strcat(path, getenv("HOME"));
+	ft_strcat(path, "/.zshrc_history");
+	if ((fd = open(path, O_RDONLY , 0444)) == -1)
+		ft_putendl_fd("Error: Open failed", 2);
+	while ((ret = get_next_line(fd, &line)))
+	{
+		ft_lstaddend(&list, ft_lstnew(line, ft_strlen(line)));
+		if (!*line)
+			break ;
+	}
+	close(fd);
+	history = ft_lsttotab(&list);
+	return (history);
+}
+
+void	replace_line_with_history(int *pos, char **line, char **history, int index)
+{
+	tputs(tgetstr("cr", NULL), 0, ft_outc);
+	write_prompt(NULL);
+	if (index)
+	{
+		ft_putstr(history[(ft_tablen(history) - index)] + 15);
+		if (*line)
+			free(*line);
+		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
+		*pos = ft_strlen(*line);
+	}
 	else
-		ft_putendl_fd("Error: couldn't write to history", 2);
+	{
+		if (*line)
+			free(*line);
+		*pos = 0;
+	}
+	tputs(tgetstr("ce", NULL), 0, ft_outc);
+}
 
-
+void	navigate_through_history(char *key, int *pos, char **line)
+{
+	static int		index;
+	static char		**history;
+	
+	(void)line;
+	if (key[0] == 10)
+	{
+		index = 0;
+		if (history && *history)
+			ft_tabfree(history);
+		history = NULL;
+		return ;
+	}
+	if (!history)
+		history = get_history(history);
+	if (!ft_strcmp(key, tgetstr("ku", NULL)))
+	{
+		if (ft_tablen(history) > index)
+			index++;
+		replace_line_with_history(pos, line, history, index);
+	}
+	else if (!ft_strcmp(key, tgetstr("kd", NULL)) && index > 0)
+	{
+		index--;
+		replace_line_with_history(pos, line, history, index);
+	}
 }
 
 void	restore_term(struct termios *term_bak)
@@ -60,6 +132,8 @@ void	restore_term(struct termios *term_bak)
 	else if (term)
 	{
 		term->c_lflag = a;
+		term->c_cc[VMIN] = 1;
+		term->c_cc[VTIME] = 0;
 		tcsetattr(0, TCSADRAIN, term);
 	}
 }
@@ -167,22 +241,19 @@ void	blblbl(char *str)
 
 int		process_special_key(char *key, int *pos, char **line)
 {	
-/*	ft_putstr("key : ");
-	blblbl(key);
-	ft_putstr(" | left : ");
-	blblbl(tgetstr("kl", NULL));
-	ft_putstr(" | right : ");
-	blblbl(tgetstr("kr", NULL));
-	ft_putendl("");
-*/
+	if (key[1])
+		if (key[1] == 91)
+			key[1] = 79;
 	if (!*line)
 		*line = ft_strnew(0);
-	if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line) > (size_t)pos[0])
+	if (!ft_strcmp(key, tgetstr("ku", NULL)) || !ft_strcmp(key, tgetstr("kd", NULL)))
+		navigate_through_history(key, pos, line);
+	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line) > (size_t)pos[0])
 	{
 		pos[0]++;
 		tputs(tgetstr("nd", NULL), 0, ft_outc);
 	}
-	if (!ft_strcmp(key, tgetstr("kl", NULL)) && pos[0])
+	else if (!ft_strcmp(key, tgetstr("kl", NULL)) && pos[0])
 	{
 		pos[0]--;
 		tputs(tgetstr("le", NULL), 0, ft_outc);
@@ -216,12 +287,10 @@ int		process_key(char *key, char **line, int *pos)
 		return (0);
 	if (key[0] == 10)
 	{
+		navigate_through_history(key, pos, line);
 		*line = ft_strinsert(*line, *key, ft_strlen(*line));
-//		tputs(tgetstr("im", NULL), 0, ft_outc);
 		tputs(tgetstr("ll", NULL), 0, ft_outc);
-
 		ft_putstr(key);
-//		tputs(tgetstr("ei", NULL), 0, ft_outc);
 		pos[0]++;
 		return (1);
 	}

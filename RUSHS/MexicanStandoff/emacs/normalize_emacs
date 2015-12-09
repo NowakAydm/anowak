@@ -1,0 +1,25 @@
+C-c C-h (si il y avait un .emacs .. cf post sur le forum)
+https://forum.intra.42.fr/topics/4271/messages/
+
+M-g g 5 RET
+M-k DEL DEL
+M-g g 3 RET
+C-y RET RET
+
+M-f SPACE
+
+M-%
+SPACE SPACE SPACE SPACE RET
+TAB RET
+!
+
+M-a M-e C-k RET
+
+C-r b RET
+M-f SPACE
+M-<
+
+M-%
+TAB TAB RET TAB RET
+SPACE SPACE SPACE
+BACKSPACE BACKSPACE BACKSPACE SPACE SPACE RET

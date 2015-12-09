@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 18:15:16 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2015/12/09 18:53:56 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct stat     t_stat;
 char	*get_in_env(char **envp, char *var);
 char	**extract_path_directories(char **envp);
 t_ftsh	*initialize_sh(int argc, char **argv, char **envp);
+int		write_prompt(char **prompt);
 
 /*
 ** -------       signals.c      --------
@@ -136,6 +137,7 @@ void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
 int		read_next_char(char **line, int *pos);
 int		read_next_line(char **line);
+int		ft_outc(int c);
 int		process_key(char *key, char **line, int *pos);
 
 /*
