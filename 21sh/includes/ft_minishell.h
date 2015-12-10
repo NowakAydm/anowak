@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/09 18:53:56 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/10 18:48:24 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 
 
 # define PROMPT "$> "
+# define PROMPTLEN 3
 
 typedef struct stat     t_stat;
 

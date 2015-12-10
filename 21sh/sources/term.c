@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/09 20:40:06 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/10 19:50:08 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,24 +19,20 @@ void	write_to_history(char *str, char ***env)
 
 	if (str && ft_strlen(str))
 	{
-		path = ft_strnew(ft_strlen("~/.zshrc_history") + ft_strlen(get_in_env(*env, "HOME")));
+		path = ft_strnew(ft_strlen("~/.zshrc_history")
+						 + ft_strlen(get_in_env(*env, "HOME")));
 		ft_strcat(path, get_in_env(*env, "HOME"));
 		ft_strcat(path, "/.zshrc_history");
-		ft_putendl(path);
-
 		if ((fd = open(path, O_WRONLY | O_CREAT | O_APPEND , 0644)) == -1)
 			ft_putendl_fd("Error: Open failed", 2);
 		else
 		{
-			ft_putstr_fd("Open - fd= ", 2);
-			ft_putnbr_fd(fd, 2);
-			ft_putendl_fd(" ", 2);
+			ft_putstr_fd(": ", fd);
+			ft_putnbr_fd(time(NULL), fd);
+			ft_putstr_fd(":0;", fd);
+			ft_putendl_fd(str, fd);
+			close(fd);
 		}
-		ft_putstr_fd(": ", fd);
-		ft_putnbr_fd(time(NULL), fd);
-		ft_putstr_fd(":0;", fd);
-		ft_putendl_fd(str, fd);
-		close(fd);
 		free(path);
 	}
 }
@@ -48,7 +44,7 @@ char	**get_history(char **history)
 	char	*path;
 	t_list	*list;
 	int		ret;
-	
+
 	line = ft_strnew(1);
 	list = NULL;
 	history = NULL;
@@ -94,7 +90,7 @@ void	navigate_through_history(char *key, int *pos, char **line)
 {
 	static int		index;
 	static char		**history;
-	
+
 	(void)line;
 	if (key[0] == 10)
 	{
@@ -169,9 +165,7 @@ int		read_next_char(char **line, int *pos)
 {
 	int		ret;
 	char	*buf;
-//	char	*new;
 
-//	printf("POS %d - %d\n", pos[0], pos[1]);
 	if (!(buf = ft_strnew(8)))
 		return (-1);
 	ret = read(0, buf, 8);
@@ -182,9 +176,10 @@ int		read_next_char(char **line, int *pos)
 		free(buf);
 		if (*line)
 			return (2);
-		return (1);			
+		return (1);
 	}
 	process_key(buf, line, pos);
+//	printf("line %d - pos %d\n", pos[1], pos[0]);
 	if (!*line)
 		return (-1);
 	free(buf);
@@ -240,7 +235,7 @@ void	blblbl(char *str)
 }
 
 int		process_special_key(char *key, int *pos, char **line)
-{	
+{
 	if (key[1])
 		if (key[1] == 91)
 			key[1] = 79;
@@ -261,21 +256,65 @@ int		process_special_key(char *key, int *pos, char **line)
 	return (0);
 }
 
-int		delete_char(int **pos, char **line)
+int		term_line_len(int n, char **line)
+{
+	char *str;
+	char *next;
+
+	str = *line;
+	while (n--)
+	{
+		str = ft_strchr(str, '\n');
+		if (str == NULL)
+			return (0);
+	}
+	if ((next = ft_strchr(str, '\n')))
+		return (next - str);
+	else
+		return (ft_strlen(str));
+
+}
+
+int		term_line_index(int *pos, char **line)
+{
+	int	i;
+	int	tot;
+
+	i = 0;
+	tot = 0;
+	if (!pos[1])
+		return (pos[0]);
+	while (i <= pos[1])
+	{
+		tot += term_line_len(i, line);
+		i++;
+	}
+	tot += pos[0];
+	printf("TERM LINE INDEX - pos %d/%d : %d\n", pos[1], pos[0], tot);
+	return (tot);
+}
+
+int		delete_char(int *pos, char **line)
 {
 	char	*str;
 
 	if (!*line)
 		*line = ft_strnew(0);
 	str = *line;
-	if (**pos == 0)
+	if (!pos[1] && !pos[0])
 		return (0);
 	tputs(tgetstr("le", NULL), 0, ft_outc);
 	tputs(tgetstr("dm", NULL), 0, ft_outc);
 	tputs(tgetstr("dc", NULL), 0, ft_outc);
 	tputs(tgetstr("ed", NULL), 0, ft_outc);
-	*pos[0] = **pos -1;
-	*line = ft_strdelchar(*line, *pos[0]);
+	if (pos[0] > 0)
+		pos[0]--;
+	else if (pos[1] > 0)
+	{
+		pos[1]--;
+		pos[0] = term_line_len(pos[1], line);
+	}
+	*line = ft_strdelchar(*line, term_line_index(pos, line));
 // DELETE THE THINGS
 //	str[*pos[0] - 1] = '!';
 	return (0);
@@ -297,8 +336,14 @@ int		process_key(char *key, char **line, int *pos)
 	else if (key[0] == 27)
 		return (process_special_key(key, pos, line));
 	else if (key[0] == 127)
-		return (delete_char(&pos, line));
+		return (delete_char(pos, line));
 	*line = ft_strinsert(*line, *key, pos[0]);
+	if ((pos[1] ? pos[0] : pos[0] + PROMPTLEN) == tgetnum("co"))
+	{
+		pos[1]++;
+		pos[0] = 0;
+		ft_putendl("newline");
+	}
 	tputs(tgetstr("im", NULL), 0, ft_outc);
 	tputs(tgetstr("ic", NULL), 0, ft_outc);
 	ft_outc(*key);

@@ -4,6 +4,8 @@ all : copy push
 copy :
 	@cp -fv ~/projects/STUFF/.emacs ~
 	@cp -fv ~/projects/STUFF/.zshrc ~
+	@mkdir ~/.emacs.d/lisp
+	@cp -fv ~/projects/STUFF/emacs/highlight-chars.el ~/.emacs.d/lisp/
 
 new :
 	sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"

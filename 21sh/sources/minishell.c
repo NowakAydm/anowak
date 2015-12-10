@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 17:10:08 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/09 18:39:52 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/10 18:46:25 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 int	write_prompt(char **prompt)
 {
 	static char *str;
-	
+
 	if (prompt)
 		if (*prompt)
 			str = *prompt;
@@ -106,6 +106,7 @@ int		main(int argc, char **argv, char **envp)
 	}
 	while (1)
 	{
+// TODO : Expand tilde
 		catch_signals();
 		if (sh->line)
 			free(sh->line);
@@ -113,8 +114,6 @@ int		main(int argc, char **argv, char **envp)
 		write_prompt(&(sh->prompt));
 		if ((sh->line = get_command_line()) != NULL)
 		{
-			ft_putendl("NEW LINE");
-			ft_putendl(sh->line);
 			sh->ret = execute_command_line(sh, &(sh->env_dup));
 			ft_tabfree(sh->path_dir);
 			sh->path_dir = extract_path_directories(sh->env_dup);

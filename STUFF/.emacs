@@ -11,8 +11,7 @@
 ;*******************************************************************************;
 
 ; Load general features files
-;(setq config_files "/usr/share/emacs/site-lisp/")
-(setq config_files "~/.emacs.d/lisp/")
+(setq config_files "/usr/share/emacs/site-lisp/")
 (setq load-path (append (list nil config_files) load-path))
 
 (load "list.el")
