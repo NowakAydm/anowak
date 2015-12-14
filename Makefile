@@ -4,7 +4,7 @@ all : copy push
 copy :
 	@cp -fv ~/projects/STUFF/.emacs ~
 	@cp -fv ~/projects/STUFF/.zshrc ~
-	@mkdir ~/.emacs.d/lisp
+	@mkdir -p ~/.emacs.d/lisp
 	@cp -fv ~/projects/STUFF/emacs/highlight-chars.el ~/.emacs.d/lisp/
 
 new :

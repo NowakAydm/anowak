@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/10 19:50:08 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/14 19:12:58 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,14 +72,14 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 	if (index)
 	{
 		ft_putstr(history[(ft_tablen(history) - index)] + 15);
-		if (*line)
+		if (**line)
 			free(*line);
 		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
 		*pos = ft_strlen(*line);
 	}
 	else
 	{
-		if (*line)
+		if (**line)
 			free(*line);
 		*pos = 0;
 	}
@@ -218,8 +218,7 @@ int		ft_outc(int c)
 		return (0);
 	if (write(1, &c, 1))
 		return (1);
-	else
-		return (0);
+	return (0);
 }
 
 void	blblbl(char *str)
@@ -240,7 +239,7 @@ int		process_special_key(char *key, int *pos, char **line)
 		if (key[1] == 91)
 			key[1] = 79;
 	if (!*line)
-		*line = ft_strnew(0);
+		*line = ft_strdup(" ");
 	if (!ft_strcmp(key, tgetstr("ku", NULL)) || !ft_strcmp(key, tgetstr("kd", NULL)))
 		navigate_through_history(key, pos, line);
 	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line) > (size_t)pos[0])
@@ -258,21 +257,25 @@ int		process_special_key(char *key, int *pos, char **line)
 
 int		term_line_len(int n, char **line)
 {
-	char *str;
-	char *next;
+	char	*str;
+	int		x;
+	int		start;
 
+	x = PROMPTLEN;
+	start = 0;
 	str = *line;
-	while (n--)
+	while (str[x])
 	{
-		str = ft_strchr(str, '\n');
-		if (str == NULL)
-			return (0);
+		if (str[x] == '\n' || x == tgetnum("co"))
+		{
+			if (!n)
+				return (x - start);
+			n--;
+			start = x;
+		}
+		x++;
 	}
-	if ((next = ft_strchr(str, '\n')))
-		return (next - str);
-	else
-		return (ft_strlen(str));
-
+	return (x - start);
 }
 
 int		term_line_index(int *pos, char **line)
@@ -284,7 +287,7 @@ int		term_line_index(int *pos, char **line)
 	tot = 0;
 	if (!pos[1])
 		return (pos[0]);
-	while (i <= pos[1])
+	while (i < pos[1])
 	{
 		tot += term_line_len(i, line);
 		i++;
@@ -329,7 +332,7 @@ int		process_key(char *key, char **line, int *pos)
 		navigate_through_history(key, pos, line);
 		*line = ft_strinsert(*line, *key, ft_strlen(*line));
 		tputs(tgetstr("ll", NULL), 0, ft_outc);
-		ft_putstr(key);
+		ft_putstr("\n");
 		pos[0]++;
 		return (1);
 	}
@@ -337,11 +340,11 @@ int		process_key(char *key, char **line, int *pos)
 		return (process_special_key(key, pos, line));
 	else if (key[0] == 127)
 		return (delete_char(pos, line));
-	*line = ft_strinsert(*line, *key, pos[0]);
+	*line = ft_strinsert(*line, *key, term_line_index(pos, line));
 	if ((pos[1] ? pos[0] : pos[0] + PROMPTLEN) == tgetnum("co"))
 	{
 		pos[1]++;
-		pos[0] = 0;
+		pos[0] = -1;
 		ft_putendl("newline");
 	}
 	tputs(tgetstr("im", NULL), 0, ft_outc);
