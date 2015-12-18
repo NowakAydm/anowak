@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/14 19:12:58 by anowak           ###   ########.fr       */
+/*   Updated: 2015/12/18 18:37:52 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 		if (**line)
 			free(*line);
 		*pos = 0;
+		pos[1] = 0;
 	}
 	tputs(tgetstr("ce", NULL), 0, ft_outc);
 }
@@ -259,23 +260,29 @@ int		term_line_len(int n, char **line)
 {
 	char	*str;
 	int		x;
+	int		flag;
 	int		start;
 
-	x = PROMPTLEN;
+	x = 0;
+	flag = n;
 	start = 0;
 	str = *line;
+//	printf("A - TERM LINE LEN - line %d\n", n);
 	while (str[x])
 	{
-		if (str[x] == '\n' || x == tgetnum("co"))
+		if (str[x] == '\n' || !((!flag && n < flag? x : x + PROMPTLEN) % tgetnum("co")))
 		{
+//			printf("B - n=%d - x=%d - start=%d --> %d\n",n,x,start, x - start);
+			x++;
 			if (!n)
 				return (x - start);
-			n--;
 			start = x;
+			n--;
+			flag = 0;
 		}
 		x++;
 	}
-	return (x - start);
+	return (0);
 }
 
 int		term_line_index(int *pos, char **line)
@@ -285,15 +292,17 @@ int		term_line_index(int *pos, char **line)
 
 	i = 0;
 	tot = 0;
-	if (!pos[1])
-		return (pos[0]);
 	while (i < pos[1])
 	{
 		tot += term_line_len(i, line);
 		i++;
 	}
+//	printf("TERM LINE INDEX - pos %d/%d : %d --> index: %d\n", pos[1], pos[0], tot, tot + pos[0]);
 	tot += pos[0];
-	printf("TERM LINE INDEX - pos %d/%d : %d\n", pos[1], pos[0], tot);
+//	tot += pos[1];
+
+	if (!pos[1])
+		return (pos[0]);
 	return (tot);
 }
 
@@ -315,9 +324,11 @@ int		delete_char(int *pos, char **line)
 	else if (pos[1] > 0)
 	{
 		pos[1]--;
-		pos[0] = term_line_len(pos[1], line);
+		pos[0] = term_line_len(pos[1], line) - 1;
 	}
+//	printf("Del char - %d/%d -> %d\n", pos[1], pos[0], term_line_index(pos, line));
 	*line = ft_strdelchar(*line, term_line_index(pos, line));
+//	ft_putendl("B");
 // DELETE THE THINGS
 //	str[*pos[0] - 1] = '!';
 	return (0);
@@ -341,7 +352,7 @@ int		process_key(char *key, char **line, int *pos)
 	else if (key[0] == 127)
 		return (delete_char(pos, line));
 	*line = ft_strinsert(*line, *key, term_line_index(pos, line));
-	if ((pos[1] ? pos[0] : pos[0] + PROMPTLEN) == tgetnum("co"))
+	if ((pos[1] ? pos[0] + 1: pos[0] + PROMPTLEN) == tgetnum("co"))
 	{
 		pos[1]++;
 		pos[0] = -1;
