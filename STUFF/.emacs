@@ -108,5 +108,5 @@
 (add-hook 'change-major-mode-hook
 		  '(lambda ()
 			(add-hook 'font-lock-mode-hook 'hc-highlight-trailing-whitespace)
-			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-hyphens)
+;;			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-hyphens)
 			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-spaces)))

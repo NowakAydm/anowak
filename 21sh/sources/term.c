@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/18 18:37:52 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/04 19:11:46 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,28 +234,6 @@ void	blblbl(char *str)
 	}
 }
 
-int		process_special_key(char *key, int *pos, char **line)
-{
-	if (key[1])
-		if (key[1] == 91)
-			key[1] = 79;
-	if (!*line)
-		*line = ft_strdup(" ");
-	if (!ft_strcmp(key, tgetstr("ku", NULL)) || !ft_strcmp(key, tgetstr("kd", NULL)))
-		navigate_through_history(key, pos, line);
-	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line) > (size_t)pos[0])
-	{
-		pos[0]++;
-		tputs(tgetstr("nd", NULL), 0, ft_outc);
-	}
-	else if (!ft_strcmp(key, tgetstr("kl", NULL)) && pos[0])
-	{
-		pos[0]--;
-		tputs(tgetstr("le", NULL), 0, ft_outc);
-	}
-	return (0);
-}
-
 int		term_line_len(int n, char **line)
 {
 	char	*str;
@@ -304,6 +282,59 @@ int		term_line_index(int *pos, char **line)
 	if (!pos[1])
 		return (pos[0]);
 	return (tot);
+}
+
+int		process_special_key(char *key, int *pos, char **line)
+{
+	int x;
+
+	x = 0;
+	if (key[1])
+		if (key[1] == 91)
+			key[1] = 79;
+	if (!*line)
+		*line = ft_strdup(" ");
+	if (!ft_strcmp(key, tgetstr("ku", NULL)) || !ft_strcmp(key, tgetstr("kd", NULL)))
+		navigate_through_history(key, pos, line);
+	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && (int)ft_strlen(*line) > term_line_index(pos, line) + 1)
+	{
+		if (pos[0] && !(term_line_index(pos, line) % tgetnum("co")))
+		{
+			ft_putendl("aaa");
+			pos[0] = 0;
+			pos[1]++;
+			tputs(tgetstr("do", NULL), 0, ft_outc);
+			tputs(tgetstr("cr", NULL), 0, ft_outc);
+		}
+		else
+		{
+			pos[0]++;
+			tputs(tgetstr("nd", NULL), 0, ft_outc);
+		}
+	}
+	else if (!ft_strcmp(key, tgetstr("kl", NULL)))
+	{
+		if (pos[0] > 0)
+		{
+			pos[0]--;
+			tputs(tgetstr("le", NULL), 0, ft_outc);
+		}
+		else if (pos[1] && pos[0] >= 0)
+		{
+			pos[0]--;
+			tputs(tgetstr("le", NULL), 0, ft_outc);
+		}
+		else if (pos[1] && pos[0] == -1)
+		{
+			tputs(tgetstr("up", NULL), 0, ft_outc);
+			pos[1]--;
+			pos[0] = term_line_len(pos[1], line);
+			x = pos[0];
+			while (x--)
+				tputs(tgetstr("nd", NULL), 0, ft_outc);
+		}
+	}
+	return (0);
 }
 
 int		delete_char(int *pos, char **line)
@@ -356,13 +387,21 @@ int		process_key(char *key, char **line, int *pos)
 	{
 		pos[1]++;
 		pos[0] = -1;
-		ft_putendl("newline");
+		ft_putendl("");
+//		ft_putendl("newline");
 	}
+	pos[0]++;
 	tputs(tgetstr("im", NULL), 0, ft_outc);
 	tputs(tgetstr("ic", NULL), 0, ft_outc);
 	ft_outc(*key);
 	tputs(tgetstr("ip", NULL), 0, ft_outc);
 	tputs(tgetstr("ei", NULL), 0, ft_outc);
-	pos[0]++;
+//	if (term_line_index(pos, line) > (int)ft_strlen(*line))
+//	{
+//		ft_putendl("printing end of previous line");
+		tputs(tgetstr("sc", NULL), 0, ft_outc);
+		ft_putstr(*line + term_line_index(pos, line));
+		tputs(tgetstr("rc", NULL), 0, ft_outc);
+//	}
 	return (0);
 }
