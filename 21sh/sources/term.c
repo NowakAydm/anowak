@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/05 16:24:55 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/05 18:12:53 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,11 @@ char	**get_history(char **history)
 void	replace_line_with_history(int *pos, char **line, char **history, int index)
 {
 	tputs(tgetstr("cr", NULL), 0, ft_outc);
+	while (pos[1]-- > 0)
+	{
+		tputs(tgetstr("cd", NULL), 0, ft_outc);
+		tputs(tgetstr("up", NULL), 0, ft_outc);
+	}
 	write_prompt(NULL);
 	if (index)
 	{
@@ -75,7 +80,8 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 		if (**line)
 			free(*line);
 		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
-		*pos = ft_strlen(*line);
+		pos[1] = (ft_strlen(*line) + PROMPTLEN) / tgetnum("co");
+		pos[0] = (ft_strlen(*line) + PROMPTLEN) % tgetnum("co") - (pos[1] ? 1 : PROMPTLEN);
 	}
 	else
 	{
@@ -403,6 +409,8 @@ int		process_key(char *key, char **line, int *pos)
 		tputs(tgetstr("ll", NULL), 0, ft_outc);
 		ft_putstr("\n");
 		pos[0]++;
+		while (term_line_len(++pos[1], line))
+			tputs(tgetstr("do", NULL), 0, ft_outc);
 		return (1);
 	}
 	else if (key[0] == 27)
@@ -422,8 +430,12 @@ int		process_key(char *key, char **line, int *pos)
 	ft_outc(*key);
 	tputs(tgetstr("ip", NULL), 0, ft_outc);
 	tputs(tgetstr("ei", NULL), 0, ft_outc);
-	tputs(tgetstr("sc", NULL), 0, ft_outc);
-	ft_putstr(*line + term_line_index(pos, line));
-	tputs(tgetstr("rc", NULL), 0, ft_outc);
+
+	if (term_line_index(pos, line) < (int)ft_strlen(*line))
+	{
+		tputs(tgetstr("sc", NULL), 0, ft_outc);
+		ft_putstr(*line + term_line_index(pos, line));
+		tputs(tgetstr("rc", NULL), 0, ft_outc);
+	}
 	return (0);
 }
