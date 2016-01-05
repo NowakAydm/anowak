@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/04 19:11:46 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/05 16:24:55 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,84 +284,104 @@ int		term_line_index(int *pos, char **line)
 	return (tot);
 }
 
-int		process_special_key(char *key, int *pos, char **line)
+void	process_left_arrow(int *pos, char **line)
 {
 	int x;
 
 	x = 0;
+	if (pos[0] > 0)
+	{
+		pos[0]--;
+		tputs(tgetstr("le", NULL), 0, ft_outc);
+	}
+	else if (pos[1] && pos[0] >= 0)
+	{
+		pos[0]--;
+		tputs(tgetstr("le", NULL), 0, ft_outc);
+	}
+	else if (pos[1] && pos[0] == -1)
+	{
+		tputs(tgetstr("up", NULL), 0, ft_outc);
+		pos[1]--;
+		pos[0] = term_line_len(pos[1], line);
+		x = pos[0];
+		while (x--)
+			tputs(tgetstr("nd", NULL), 0, ft_outc);
+		if (!pos[1])
+			pos[0] -= PROMPTLEN;
+	}
+	return ;
+}
+
+void	process_right_arrow(int *pos)
+{
+	if (pos[0] + 1 == (pos[1] ? tgetnum("co") : tgetnum("co") - PROMPTLEN))
+	{
+		pos[0] = -1;
+		pos[1]++;
+		tputs(tgetstr("do", NULL), 0, ft_outc);
+			tputs(tgetstr("cr", NULL), 0, ft_outc);
+	}
+	else
+	{
+		pos[0]++;
+		tputs(tgetstr("nd", NULL), 0, ft_outc);
+	}
+	return ;
+}
+
+int		process_special_key(char *key, int *pos, char **line)
+{
 	if (key[1])
 		if (key[1] == 91)
 			key[1] = 79;
 	if (!*line)
-		*line = ft_strdup(" ");
+		*line = ft_strdup("");
 	if (!ft_strcmp(key, tgetstr("ku", NULL)) || !ft_strcmp(key, tgetstr("kd", NULL)))
 		navigate_through_history(key, pos, line);
-	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && (int)ft_strlen(*line) > term_line_index(pos, line) + 1)
-	{
-		if (pos[0] && !(term_line_index(pos, line) % tgetnum("co")))
-		{
-			ft_putendl("aaa");
-			pos[0] = 0;
-			pos[1]++;
-			tputs(tgetstr("do", NULL), 0, ft_outc);
-			tputs(tgetstr("cr", NULL), 0, ft_outc);
-		}
-		else
-		{
-			pos[0]++;
-			tputs(tgetstr("nd", NULL), 0, ft_outc);
-		}
-	}
 	else if (!ft_strcmp(key, tgetstr("kl", NULL)))
-	{
-		if (pos[0] > 0)
-		{
-			pos[0]--;
-			tputs(tgetstr("le", NULL), 0, ft_outc);
-		}
-		else if (pos[1] && pos[0] >= 0)
-		{
-			pos[0]--;
-			tputs(tgetstr("le", NULL), 0, ft_outc);
-		}
-		else if (pos[1] && pos[0] == -1)
-		{
-			tputs(tgetstr("up", NULL), 0, ft_outc);
-			pos[1]--;
-			pos[0] = term_line_len(pos[1], line);
-			x = pos[0];
-			while (x--)
-				tputs(tgetstr("nd", NULL), 0, ft_outc);
-		}
-	}
+		process_left_arrow(pos, line);
+	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line)
+			 && (int)ft_strlen(*line) > term_line_index(pos, line))
+		process_right_arrow(pos);
 	return (0);
 }
 
 int		delete_char(int *pos, char **line)
 {
+	int		x;
 	char	*str;
 
+	x = 0;
 	if (!*line)
 		*line = ft_strnew(0);
 	str = *line;
 	if (!pos[1] && !pos[0])
 		return (0);
-	tputs(tgetstr("le", NULL), 0, ft_outc);
-	tputs(tgetstr("dm", NULL), 0, ft_outc);
-	tputs(tgetstr("dc", NULL), 0, ft_outc);
-	tputs(tgetstr("ed", NULL), 0, ft_outc);
-	if (pos[0] > 0)
-		pos[0]--;
-	else if (pos[1] > 0)
+	if (pos[0] >= 0)
 	{
-		pos[1]--;
-		pos[0] = term_line_len(pos[1], line) - 1;
+		tputs(tgetstr("le", NULL), 0, ft_outc);
+		tputs(tgetstr("dm", NULL), 0, ft_outc);
+		tputs(tgetstr("dc", NULL), 0, ft_outc);
+		tputs(tgetstr("ed", NULL), 0, ft_outc);
+		pos[0]--;
 	}
-//	printf("Del char - %d/%d -> %d\n", pos[1], pos[0], term_line_index(pos, line));
+	if (pos[1] > 0 && pos[0] == -1)
+	{
+		tputs(tgetstr("up", NULL), 0, ft_outc);
+		pos[1]--;
+		pos[0] = term_line_len(pos[1], line);
+		x = pos[0];
+		while (x--)
+			tputs(tgetstr("nd", NULL), 0, ft_outc);
+		if (!pos[1])
+			pos[0] -= PROMPTLEN;
+	}
 	*line = ft_strdelchar(*line, term_line_index(pos, line));
-//	ft_putendl("B");
-// DELETE THE THINGS
-//	str[*pos[0] - 1] = '!';
+	tputs(tgetstr("sc", NULL), 0, ft_outc);
+	ft_putstr(*line + term_line_index(pos, line));
+	ft_outc(' ');
+	tputs(tgetstr("rc", NULL), 0, ft_outc);
 	return (0);
 }
 
@@ -369,6 +389,13 @@ int		process_key(char *key, char **line, int *pos)
 {
 	if (!key)
 		return (0);
+//	blblbl(key);
+//	ft_putendl("");
+	if (key[0] == 4)
+	{
+		ft_strclr(*line);
+		key[0] = 10;
+	}
 	if (key[0] == 10)
 	{
 		navigate_through_history(key, pos, line);
@@ -388,7 +415,6 @@ int		process_key(char *key, char **line, int *pos)
 		pos[1]++;
 		pos[0] = -1;
 		ft_putendl("");
-//		ft_putendl("newline");
 	}
 	pos[0]++;
 	tputs(tgetstr("im", NULL), 0, ft_outc);
@@ -396,12 +422,8 @@ int		process_key(char *key, char **line, int *pos)
 	ft_outc(*key);
 	tputs(tgetstr("ip", NULL), 0, ft_outc);
 	tputs(tgetstr("ei", NULL), 0, ft_outc);
-//	if (term_line_index(pos, line) > (int)ft_strlen(*line))
-//	{
-//		ft_putendl("printing end of previous line");
-		tputs(tgetstr("sc", NULL), 0, ft_outc);
-		ft_putstr(*line + term_line_index(pos, line));
-		tputs(tgetstr("rc", NULL), 0, ft_outc);
-//	}
+	tputs(tgetstr("sc", NULL), 0, ft_outc);
+	ft_putstr(*line + term_line_index(pos, line));
+	tputs(tgetstr("rc", NULL), 0, ft_outc);
 	return (0);
 }
