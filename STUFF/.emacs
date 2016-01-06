@@ -6,7 +6,7 @@
 ;    by: thor <thor@42.fr>                           +#+  +:+       +#+         ;
 ;                                                  +#+#+#+#+#+   +#+            ;
 ;    Created: 2013/06/18 14:01:14 by thor               #+#    #+#              ;
-;    Updated: 2015/12/09 17:44:20 by anowak           ###   ########.fr        ;
+;    Updated: 2016/01/06 18:52:05 by anowak           ###   ########.fr        ;
 ;                                                                               ;
 ;*******************************************************************************;
 
@@ -22,6 +22,9 @@
 (setq config_files "/nfs/zfs-student-4/users/anowak/.emacs.d/lisp/")
 (setq load-path (append (list nil config_files) load-path))
 (load "highlight-chars.el")
+(load "template.el")
+
+(custom-set-variables '(template-use-package t nil (template)))
 
 ; Set default emacs configuration
 (set-language-environment "UTF-8")
