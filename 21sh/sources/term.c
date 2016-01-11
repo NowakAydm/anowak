@@ -6,121 +6,11 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/05 18:12:53 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/11 19:12:16 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	write_to_history(char *str, char ***env)
-{
-	int	fd;
-	char *path;
-
-	if (str && ft_strlen(str))
-	{
-		path = ft_strnew(ft_strlen("~/.zshrc_history")
-						 + ft_strlen(get_in_env(*env, "HOME")));
-		ft_strcat(path, get_in_env(*env, "HOME"));
-		ft_strcat(path, "/.zshrc_history");
-		if ((fd = open(path, O_WRONLY | O_CREAT | O_APPEND , 0644)) == -1)
-			ft_putendl_fd("Error: Open failed", 2);
-		else
-		{
-			ft_putstr_fd(": ", fd);
-			ft_putnbr_fd(time(NULL), fd);
-			ft_putstr_fd(":0;", fd);
-			ft_putendl_fd(str, fd);
-			close(fd);
-		}
-		free(path);
-	}
-}
-
-char	**get_history(char **history)
-{
-	int		fd;
-	char	*line;
-	char	*path;
-	t_list	*list;
-	int		ret;
-
-	line = ft_strnew(1);
-	list = NULL;
-	history = NULL;
-	ret = 1;
-	path = ft_strnew(ft_strlen("~/.zshrc_history") + ft_strlen(getenv("HOME")));
-	ft_strcat(path, getenv("HOME"));
-	ft_strcat(path, "/.zshrc_history");
-	if ((fd = open(path, O_RDONLY , 0444)) == -1)
-		ft_putendl_fd("Error: Open failed", 2);
-	while ((ret = get_next_line(fd, &line)))
-	{
-		ft_lstaddend(&list, ft_lstnew(line, ft_strlen(line)));
-		if (!*line)
-			break ;
-	}
-	close(fd);
-	history = ft_lsttotab(&list);
-	return (history);
-}
-
-void	replace_line_with_history(int *pos, char **line, char **history, int index)
-{
-	tputs(tgetstr("cr", NULL), 0, ft_outc);
-	while (pos[1]-- > 0)
-	{
-		tputs(tgetstr("cd", NULL), 0, ft_outc);
-		tputs(tgetstr("up", NULL), 0, ft_outc);
-	}
-	write_prompt(NULL);
-	if (index)
-	{
-		ft_putstr(history[(ft_tablen(history) - index)] + 15);
-		if (**line)
-			free(*line);
-		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
-		pos[1] = (ft_strlen(*line) + PROMPTLEN) / tgetnum("co");
-		pos[0] = (ft_strlen(*line) + PROMPTLEN) % tgetnum("co") - (pos[1] ? 1 : PROMPTLEN);
-	}
-	else
-	{
-		if (**line)
-			free(*line);
-		*pos = 0;
-		pos[1] = 0;
-	}
-	tputs(tgetstr("ce", NULL), 0, ft_outc);
-}
-
-void	navigate_through_history(char *key, int *pos, char **line)
-{
-	static int		index;
-	static char		**history;
-
-	(void)line;
-	if (key[0] == 10)
-	{
-		index = 0;
-		if (history && *history)
-			ft_tabfree(history);
-		history = NULL;
-		return ;
-	}
-	if (!history)
-		history = get_history(history);
-	if (!ft_strcmp(key, tgetstr("ku", NULL)))
-	{
-		if (ft_tablen(history) > index)
-			index++;
-		replace_line_with_history(pos, line, history, index);
-	}
-	else if (!ft_strcmp(key, tgetstr("kd", NULL)) && index > 0)
-	{
-		index--;
-		replace_line_with_history(pos, line, history, index);
-	}
-}
 
 void	restore_term(struct termios *term_bak)
 {
@@ -319,25 +209,44 @@ void	process_left_arrow(int *pos, char **line)
 	return ;
 }
 
-void	process_right_arrow(int *pos)
+void	process_right_arrow(int *pos, char **line)
 {
-	if (pos[0] + 1 == (pos[1] ? tgetnum("co") : tgetnum("co") - PROMPTLEN))
+	if (ft_strlen(*line) && (int)ft_strlen(*line) > term_line_index(pos, line))
 	{
-		pos[0] = -1;
-		pos[1]++;
-		tputs(tgetstr("do", NULL), 0, ft_outc);
+		if (pos[0] + 1 == (pos[1] ? tgetnum("co") : tgetnum("co") - PROMPTLEN))
+		{
+			pos[0] = -1;
+			pos[1]++;
+			tputs(tgetstr("do", NULL), 0, ft_outc);
 			tputs(tgetstr("cr", NULL), 0, ft_outc);
-	}
-	else
-	{
-		pos[0]++;
-		tputs(tgetstr("nd", NULL), 0, ft_outc);
+		}
+		else
+		{
+			pos[0]++;
+			tputs(tgetstr("nd", NULL), 0, ft_outc);
+		}
 	}
 	return ;
 }
 
+void	go_to_endl(int *pos, char **line)
+{
+	while (ft_strlen(*line) && (int)ft_strlen(*line) > term_line_index(pos, line))
+		process_right_arrow(pos, line);
+}
+
+void	go_to_begl(int *pos, char **line)
+{
+	while (pos[0] || pos[1])
+		process_left_arrow(pos, line);
+}
+
 int		process_special_key(char *key, int *pos, char **line)
 {
+	if (key[1] == 91 && key[2] == 70)
+		go_to_endl(pos, line);
+	else if (key[1] == 91 && key[2] == 72)
+		go_to_begl(pos, line);
 	if (key[1])
 		if (key[1] == 91)
 			key[1] = 79;
@@ -347,9 +256,8 @@ int		process_special_key(char *key, int *pos, char **line)
 		navigate_through_history(key, pos, line);
 	else if (!ft_strcmp(key, tgetstr("kl", NULL)))
 		process_left_arrow(pos, line);
-	else if (!ft_strcmp(key, tgetstr("kr", NULL)) && ft_strlen(*line)
-			 && (int)ft_strlen(*line) > term_line_index(pos, line))
-		process_right_arrow(pos);
+	else if (!ft_strcmp(key, tgetstr("kr", NULL)))
+		process_right_arrow(pos, line);
 	return (0);
 }
 
@@ -386,7 +294,7 @@ int		delete_char(int *pos, char **line)
 	*line = ft_strdelchar(*line, term_line_index(pos, line));
 	tputs(tgetstr("sc", NULL), 0, ft_outc);
 	ft_putstr(*line + term_line_index(pos, line));
-	ft_outc(' ');
+	ft_putstr("        ");
 	tputs(tgetstr("rc", NULL), 0, ft_outc);
 	return (0);
 }
@@ -417,25 +325,30 @@ int		process_key(char *key, char **line, int *pos)
 		return (process_special_key(key, pos, line));
 	else if (key[0] == 127)
 		return (delete_char(pos, line));
-	*line = ft_strinsert(*line, *key, term_line_index(pos, line));
-	if ((pos[1] ? pos[0] + 1: pos[0] + PROMPTLEN) == tgetnum("co"))
+	else if (ft_isprint(key[0]))
 	{
-		pos[1]++;
-		pos[0] = -1;
-		ft_putendl("");
-	}
-	pos[0]++;
-	tputs(tgetstr("im", NULL), 0, ft_outc);
-	tputs(tgetstr("ic", NULL), 0, ft_outc);
-	ft_outc(*key);
-	tputs(tgetstr("ip", NULL), 0, ft_outc);
-	tputs(tgetstr("ei", NULL), 0, ft_outc);
+		*line = ft_strinsert(*line, *key, term_line_index(pos, line));
+		if ((pos[1] ? pos[0] + 1: pos[0] + PROMPTLEN) == tgetnum("co"))
+		{
+			pos[1]++;
+			pos[0] = -1;
+			ft_putendl("");
+		}
+		pos[0]++;
+		tputs(tgetstr("im", NULL), 0, ft_outc);
+		tputs(tgetstr("ic", NULL), 0, ft_outc);
+		ft_outc(*key);
+		tputs(tgetstr("ip", NULL), 0, ft_outc);
+		tputs(tgetstr("ei", NULL), 0, ft_outc);
 
-	if (term_line_index(pos, line) < (int)ft_strlen(*line))
-	{
-		tputs(tgetstr("sc", NULL), 0, ft_outc);
-		ft_putstr(*line + term_line_index(pos, line));
-		tputs(tgetstr("rc", NULL), 0, ft_outc);
+		if (term_line_index(pos, line) < (int)ft_strlen(*line))
+		{
+			tputs(tgetstr("sc", NULL), 0, ft_outc);
+			ft_putstr(*line + term_line_index(pos, line));
+			tputs(tgetstr("rc", NULL), 0, ft_outc);
+		}
 	}
+	if (!*line)
+		*line = ft_strnew(0);
 	return (0);
 }

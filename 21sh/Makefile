@@ -6,7 +6,7 @@
 #    By: anowak <anowak@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/25 14:42:56 by anowak            #+#    #+#              #
-#    Updated: 2015/11/09 21:45:51 by anowak           ###   ########.fr        #
+#    Updated: 2016/01/11 18:06:34 by anowak           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -35,6 +35,7 @@ SRC =		minishell.c			\
 			builtin_setenv.c	\
 			builtin_unsetenv.c	\
 			command_line.c		\
+			history.c			\
 			term.c
 
 SRCS =		$(addprefix $(SRC_DIR)/, $(not_dir $(SRC))

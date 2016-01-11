@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/10 18:48:24 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/11 19:04:32 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,9 +131,18 @@ int		dist_to_next_quote(char *line, int c);
 int		find_path_to_command(t_cmd *new, char **path_dir);
 
 /*
-** -------      term.c     --------
+** -------      history.c     --------
 */
 void	write_to_history(char *str, char ***env);
+char	**get_history(char **history);
+void	replace_line_with_history(int *pos, char **line, char **history, int index);
+void	navigate_through_history(char *key, int *pos, char **line);
+
+/*
+** -------      term.c     --------
+*/
+void	go_to_endl(int *pos, char **line);
+void	go_to_begl(int *pos, char **line);
 void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
 int		read_next_char(char **line, int *pos);
