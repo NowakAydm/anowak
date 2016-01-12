@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/11 18:06:46 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/11 19:22:02 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/12 19:30:38 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,16 +77,25 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 	write_prompt(NULL);
 	if (index)
 	{
-		tputs(tgetstr("sc", NULL), 0, ft_outc);
-		ft_putstr(history[(ft_tablen(history) - index)] + 15);
-		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
-		tputs(tgetstr("rc", NULL), 0, ft_outc);
-		if (**line)
-			free(*line);
 		pos[0] = 0;
 		pos[1] = 0;
-		go_to_endl(pos, line);
-//		printf("%d - %d\n", pos[0], pos[1]);
+		ft_putstr(history[(ft_tablen(history) - index)] + 15);
+		*line = ft_strdup(history[(ft_tablen(history) - index)] + 15);
+
+		int x = 0;
+		while (x <= (int) ft_strlen(*line))
+		{
+			pos[0]++;
+			x++;
+			if ((pos[1] ? pos[0]: pos[0] + PROMPTLEN) == tgetnum("co"))
+			{
+				pos[1]++;
+				pos[0] = -1;
+//			ft_putendl("");
+			}
+		}
+//		tputs(tgetstr("rc", NULL), 0, ft_outc);
+//		go_to_endl(pos, line);
 //		pos[1] = (ft_strlen(*line) + PROMPTLEN) / tgetnum("co");
 //		pos[0] = (ft_strlen(*line) + PROMPTLEN) % tgetnum("co") - (pos[1] ? 1 : PROMPTLEN);
 	}

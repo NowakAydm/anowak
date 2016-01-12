@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/11 19:04:32 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/12 17:36:29 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ int		initialize_term(t_ftsh *sh, char **envp);
 int		read_next_char(char **line, int *pos);
 int		read_next_line(char **line);
 int		ft_outc(int c);
+void	insert_key(char *key, char **line, int *pos);
 int		process_key(char *key, char **line, int *pos);
 
 /*
