@@ -6,7 +6,7 @@
 //   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        //
 //                                                +#+#+#+#+#+   +#+           //
 //   Created: 2016/01/06 18:53:53 by anowak            #+#    #+#             //
-//   Updated: 2016/01/06 20:17:37 by anowak           ###   ########.fr       //
+//   Updated: 2016/01/08 23:52:13 by AdamNowak        ###   ########.fr       //
 //                                                                            //
 // ************************************************************************** //
 
@@ -14,7 +14,7 @@
 
 std::string randomName()
 {
-	std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+x	std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	std::string name;
 
 	for (unsigned int i = 0; i < (rand() % 50 + 5); i++)

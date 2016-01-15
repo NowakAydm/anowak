@@ -1,0 +1,10 @@
+#include <iostream>
+
+Contact::Contact() {
+	std::cout << ">> Contact CONSTRUCTOR CALLED" << std::endl;
+	Contact::_ContactNb++;
+	std::cout << "-- This is the ";
+	std::cout << Contact::_ContactNb << "nth contact." << std::endl;
+}
+Contact::~Contact() {
+	std::cout << "<< Contact DESTRUCTOR CALLED" << std::endl;

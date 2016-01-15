@@ -1,0 +1,13 @@
+#ifndef PHONEBOOK_HPP
+# define PHONEBOOK_HPP
+
+Class Contact {
+
+public  :
+	int getContactNb ( void );
+
+private :
+	int	_ContactNb
+};
+
+#endif

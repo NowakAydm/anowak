@@ -1,0 +1,42 @@
+#include <iostream>
+#include <string.h>
+#include "Contact.Class.hpp"
+
+Contact::Contact() {
+	std::cout << ">> Contact CONSTRUCTOR CALLED" << std::endl;
+	Contact::_ContactNb++;
+	std::cout << "-- This is the ";
+	std::cout << Contact::_ContactNb << "nth contact." << std::endl;
+}
+Contact::~Contact() {
+	std::cout << "<< Contact DESTRUCTOR CALLED" << std::endl;
+
+int		main( void ) {
+
+	char str[10];
+
+	std::cout << "....xxxx****   AWESOME PHONEBOOK 4000   ****xxxx...." << std::endl;
+	std::cout << " \\/                                              \\/" << std::endl;
+	std::cout << " ||       -   ADD    - add a contact             ||" << std::endl;
+	std::cout << " ||       -   SEARCH - search a contact          ||" << std::endl;
+	std::cout << " ||       -   EXIT   - exit program              ||" << std::endl;
+	std::cout << " /\\                                              /\\" << std::endl;
+	std::cout << "****xxxx....................................xxxx****" << std::endl;
+	std::cout << "Your choice : ";
+	std::cin >> str;
+
+	while ( strcmp( str, "EXIT" ) )
+	{
+		if ( !strcmp( str, "ADD" ) )
+			std::cout << "---- ADD A CONTACT ----" << std::endl;
+		else if ( !strcmp( str, "SEARCH" ) )
+			std::cout << "---- SEARCH IN PHONEBOOK ----" << std::endl;
+		else
+			std::cout << "This is not a valid answer." << std::endl;
+		
+		std::cout << "Your choice : ";
+		std::cin >> str;
+	}
+
+	return (0);
+}

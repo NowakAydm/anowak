@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/15 18:21:25 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/12 19:31:28 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,30 +236,6 @@ void	process_right_arrow(int *pos, char **line)
 	return ;
 }
 
-void	go_up_aline(int *pos, char **line)
-{
-	if (pos[1])
-	{
-		(void) line;
-		pos[1]--;
-		if (!pos[1])
-			pos[0] -= PROMPTLEN - 1;
-		tputs(tgetstr("up", NULL), 0, ft_outc);
-	}
-}
-
-void	go_down_aline(int *pos, char **line)
-{
-	int x = 0;
-
-	if (!pos[1])
-		x++;
-	while (x++ <= tgetnum("co"))
-	{
-		process_right_arrow(pos, line);		
-	}
-}
-
 void	go_to_endl(int *pos, char **line)
 {
 	while (ft_strlen(*line) && (int)ft_strlen(*line) > term_line_index(pos, line))
@@ -272,46 +248,11 @@ void	go_to_begl(int *pos, char **line)
 		process_left_arrow(pos, line);
 }
 
-int		process_copypaste(char *key, int *pos, char **line)
-{
-	static char	*clip;
-	int			x;
-
-	if (key[0] == 11)
-	{
-		if (clip)
-			free(clip);
-		clip = ft_strdup(*line + term_line_index(pos, line));
-		ft_strclr(*line + term_line_index(pos, line));
-	tputs(tgetstr("sc", NULL), 0, ft_outc);
-		x = ft_strlen(clip);
-		while (x--)
-			ft_putstr(" ");
-	tputs(tgetstr("rc", NULL), 0, ft_outc);
-//		ft_putendl("copied to clip =");
-//		ft_putendl(clip);
-	}
-	else if (key[0] == 25)
-	{
-		x = -1;
-		while (++x < (int) ft_strlen(clip))
-			insert_key(clip + x, line, pos);
-	}
-	return (0);
-}
-
 int		process_special_key(char *key, int *pos, char **line)
 {
-	if (key[3])
-	{
-		if (key[1] == 27 && key[2] == 91 && key[3] == 65)
-			go_up_aline(pos, line);
-		if (key[1] == 27 && key[2] == 91 && key[3] == 66)
-			go_down_aline(pos, line);
-	}
-	if ((key[1] == 91 && key[2] == 70) || key[0] == 5)
+	if (key[1] == 91 && key[2] == 70)
 		go_to_endl(pos, line);
-	else if ((key[1] == 91 && key[2] == 72) || key[0] == 1)
+	else if (key[1] == 91 && key[2] == 72)
 		go_to_begl(pos, line);
 	if (key[1])
 		if (key[1] == 91)
@@ -350,7 +291,7 @@ int		delete_char(int *pos, char **line)
 	{
 		tputs(tgetstr("up", NULL), 0, ft_outc);
 		pos[1]--;
-		pos[0] = term_line_len(pos[1], line) - 1;
+		pos[0] = term_line_len(pos[1], line);
 		x = pos[0];
 		while (x--)
 			tputs(tgetstr("nd", NULL), 0, ft_outc);
@@ -371,13 +312,8 @@ void	insert_key(char *key, char **line, int *pos)
 	if ((pos[1] ? pos[0] + 1: pos[0] + PROMPTLEN) == tgetnum("co"))
 	{
 		pos[1]++;
-//		if (pos[1] > 1)
-//			pos[0] = 0;
-//		else
 			pos[0] = -1;
-//		ft_putnbr(pos[0]);
-//		ft_putnbr(pos[1]);
-		ft_putendl("");
+			ft_putendl("");
 	}
 	pos[0]++;
 	tputs(tgetstr("im", NULL), 0, ft_outc);
@@ -418,10 +354,8 @@ int		process_key(char *key, char **line, int *pos)
 			tputs(tgetstr("do", NULL), 0, ft_outc);
 		return (1);
 	}
-	else if (key[0] == 27 || key[0] == 1 || key[0] == 5)
+	else if (key[0] == 27)
 		return (process_special_key(key, pos, line));
-	else if (key[0] == 11 || key[0] == 25)
-		return (process_copypaste(key, pos, line));
 	else if (key[0] == 127)
 		return (delete_char(pos, line));
 	else if (ft_isprint(key[0]))
