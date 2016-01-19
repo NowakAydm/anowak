@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 17:31:51 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/09 21:32:26 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/19 15:23:24 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void		process_terminate_in_sh(int signum)
 	(void)signum;
 	ft_putendl("");
 	ft_putstr(PROMPT);
+	clear_line(NULL);
 	return ;
 }
 

@@ -6,22 +6,23 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/11 18:06:46 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/15 18:23:25 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/19 16:29:25 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-void	write_to_history(char *str, char ***env)
+void	write_to_history(char *str)
 {
-	int	fd;
-	char *path;
+	int		fd;
+	char	*path;
+	int		x;
 
 	if (str && ft_strlen(str))
 	{
 		path = ft_strnew(ft_strlen("~/.zshrc_history")
-						 + ft_strlen(get_in_env(*env, "HOME")));
-		ft_strcat(path, get_in_env(*env, "HOME"));
+						 + ft_strlen(getenv("HOME")));
+		ft_strcat(path, getenv("HOME"));
 		ft_strcat(path, "/.zshrc_history");
 		if ((fd = open(path, O_WRONLY | O_CREAT | O_APPEND , 0644)) == -1)
 			ft_putendl_fd("Error: Open failed", 2);
@@ -30,13 +31,41 @@ void	write_to_history(char *str, char ***env)
 			ft_putstr_fd(": ", fd);
 			ft_putnbr_fd(time(NULL), fd);
 			ft_putstr_fd(":0;", fd);
-			ft_putendl_fd(str, fd);
+			x = 0;
+			while (str[x])
+			{
+				if (str[x] == '\n')
+					write(fd, "\\", 1);
+				write(fd, str + x, 1);
+				x++;
+			}
+			write(fd, "\n", 1);
 			close(fd);
 		}
 		free(path);
 	}
 }
+/*
+char	*add_next_line(char **line, int fd)
+{
+	int		ret;
+	char	*nextl;
+	char	*dup;
 
+	ret = 1;
+	nextl = NULL;
+	if ((ret = get_next_line(fd, &nextl)))
+	{
+		dup = ft_strnew(ft_strlen(*line) + ft_strlen(nextl) + 1);
+		ft_strncpy(dup, *line, ft_strlen(*line) - 1);
+		ft_strcat(dup, "\n");
+		ft_strncat(dup, nextl, ft_strlen(nextl) - 1);
+		free(*line);
+		*line = dup;
+	}
+	return (*line);
+}
+*/
 char	**get_history(char **history)
 {
 	int		fd;
@@ -56,6 +85,8 @@ char	**get_history(char **history)
 		ft_putendl_fd("Error: Open failed", 2);
 	while ((ret = get_next_line(fd, &line)))
 	{
+//		while (*(line + ft_strlen(line) - 1) == '\\')
+//			add_next_line(&line, fd);
 		ft_lstaddend(&list, ft_lstnew(line, ft_strlen(line)));
 		if (!*line)
 			break ;
@@ -75,7 +106,7 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 		tputs(tgetstr("up", NULL), 0, ft_outc);
 	}
 	write_prompt(NULL);
-	if (index)
+	if (index && ft_strlen(history[(ft_tablen(history) - index)]) > 15)
 	{
 		pos[0] = 0;
 		pos[1] = 0;
@@ -94,14 +125,9 @@ void	replace_line_with_history(int *pos, char **line, char **history, int index)
 				else
 					pos[0] = -1;
 				pos[1]++;
-//			ft_putendl("");
 			}
 		}
-			pos[0]--;
-//		tputs(tgetstr("rc", NULL), 0, ft_outc);
-//		go_to_endl(pos, line);
-//		pos[1] = (ft_strlen(*line) + PROMPTLEN) / tgetnum("co");
-//		pos[0] = (ft_strlen(*line) + PROMPTLEN) % tgetnum("co") - (pos[1] ? 1 : PROMPTLEN);
+		pos[0]--;
 	}
 	else
 	{

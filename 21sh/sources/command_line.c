@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/03 18:15:59 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/19 16:12:52 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,6 @@ t_list	*process_command_line(char *line, char ***env_dup, int ret)
 	t_list	*cur;
 	t_list	*new_cmd;
 
-	write_to_history(line, env_dup);
 	if (!(args = split_into_args(line, env_dup, ret)))
 		return (NULL);
 	cmds = NULL;
@@ -143,5 +142,6 @@ t_list	*process_command_line(char *line, char ***env_dup, int ret)
 			return (NULL);
 	ft_lstdel(&new_cmd, ft_lstdelcontent);
 	ft_lstdel(&args, ft_lstdelcontent);
+	write_to_history(line);
 	return (cmds);
 }

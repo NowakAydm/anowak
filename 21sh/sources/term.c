@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/26 17:33:37 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/15 18:21:25 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/19 15:33:45 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,25 @@
 void	restore_term(struct termios *term_bak)
 {
 	static struct termios	*term;
-	static unsigned long	a;
+	static unsigned long	i;
+	static unsigned long	o;
+	static unsigned long	c;
+	static unsigned long	l;
 
 	if (term_bak)
 	{
 		term = term_bak;
-		a = term_bak->c_lflag;
+		i = term_bak->c_iflag;
+		o = term_bak->c_oflag;
+		c = term_bak->c_cflag;
+		l = term_bak->c_lflag;
 	}
 	else if (term)
 	{
-		term->c_lflag = a;
+		term->c_iflag = i;
+		term->c_oflag = o;
+		term->c_cflag = c;
+		term->c_lflag = l;
 		term->c_cc[VMIN] = 1;
 		term->c_cc[VTIME] = 0;
 		tcsetattr(0, TCSADRAIN, term);
@@ -63,6 +72,7 @@ int		read_next_char(char **line, int *pos)
 	int		ret;
 	char	*buf;
 
+	clear_line(line);
 	if (!(buf = ft_strnew(8)))
 		return (-1);
 	ret = read(0, buf, 8);
@@ -81,6 +91,16 @@ int		read_next_char(char **line, int *pos)
 		return (-1);
 	free(buf);
 	return (0);
+}
+
+void	clear_line(char **line)
+{
+	static char **save;
+
+	if (line)
+		save = line;
+	else
+		ft_strdel(save);
 }
 
 int		read_next_line(char **line)
@@ -246,6 +266,8 @@ void	go_up_aline(int *pos, char **line)
 			pos[0] -= PROMPTLEN - 1;
 		tputs(tgetstr("up", NULL), 0, ft_outc);
 	}
+	else
+		go_to_begl(pos, line);
 }
 
 void	go_down_aline(int *pos, char **line)
@@ -255,9 +277,7 @@ void	go_down_aline(int *pos, char **line)
 	if (!pos[1])
 		x++;
 	while (x++ <= tgetnum("co"))
-	{
-		process_right_arrow(pos, line);		
-	}
+		process_right_arrow(pos, line);
 }
 
 void	go_to_endl(int *pos, char **line)
@@ -271,6 +291,27 @@ void	go_to_begl(int *pos, char **line)
 	while (pos[0] || pos[1])
 		process_left_arrow(pos, line);
 }
+
+void	go_to_prevword(int *pos, char **line)
+{
+	if (ft_isspace(*(*line + term_line_index(pos, line) - 1)))
+		while (ft_isspace(*(*line + term_line_index(pos, line) - 1)) && term_line_index(pos, line))
+			process_left_arrow(pos, line);
+	while (!ft_isspace(*(*line + term_line_index(pos, line) - 1)) && term_line_index(pos, line))
+		process_left_arrow(pos, line);
+}
+
+void	go_to_nextword(int *pos, char **line)
+{
+	if (!ft_isspace(*(*line + term_line_index(pos, line))))
+		while (!ft_isspace(*(*line + term_line_index(pos, line)))
+			   && term_line_index(pos, line) < (int) ft_strlen(*line))
+			process_right_arrow(pos, line);
+	while (ft_isspace(*(*line + term_line_index(pos, line)))
+		   && term_line_index(pos, line) < (int) ft_strlen(*line))
+		process_right_arrow(pos, line);
+}
+
 
 int		process_copypaste(char *key, int *pos, char **line)
 {
@@ -304,6 +345,10 @@ int		process_special_key(char *key, int *pos, char **line)
 {
 	if (key[3])
 	{
+		if (key[1] == 27 && key[2] == 91 && key[3] == 68)
+			go_to_prevword(pos, line);
+		if (key[1] == 27 && key[2] == 91 && key[3] == 67)
+			go_to_nextword(pos, line);
 		if (key[1] == 27 && key[2] == 91 && key[3] == 65)
 			go_up_aline(pos, line);
 		if (key[1] == 27 && key[2] == 91 && key[3] == 66)

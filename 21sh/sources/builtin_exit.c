@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/16 18:14:26 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/11 22:32:26 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/19 14:22:48 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	builtin_exit(int ac, char **av)
 	if (ac < 2)
 	{
 		restore_term(NULL);
+		restore_term(NULL);
 		while (1)
 			exit(0);
 	}
@@ -24,6 +25,7 @@ int	builtin_exit(int ac, char **av)
 	{
 		if (ft_atoi(av[1]))
 		{
+			restore_term(NULL);
 			restore_term(NULL);
 			while (1)
 				exit(ft_atoi(av[1]));

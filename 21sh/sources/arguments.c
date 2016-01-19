@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 18:37:49 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/19 14:56:52 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,30 @@ void	replace_by_env_var(t_list *list, char **env, int ret)
 	}
 }
 
+void	replace_tilde(t_list *list, char **env)
+{
+	t_list	*tmp;
+	char	*str = NULL;
+	char	*home = NULL;
+	int		x;
+
+	tmp = list;
+	while (tmp)
+	{
+		if (*((char*)tmp->content) == '~' && (home = get_in_env(env, "HOME")))
+		{
+			str = ft_strdup(tmp->content);
+			*str = *home;
+			x = 0;
+			while (++x < (int) ft_strlen(home))
+				str = ft_strinsert(str, *(home + x), x);
+			free(tmp->content);
+			tmp->content = str;
+		}
+		tmp = tmp->next;
+	}
+}
+
 t_list	*split_into_args(char *line, char ***env, int ret)
 {
 	t_list	*list;
@@ -130,5 +154,6 @@ t_list	*split_into_args(char *line, char ***env, int ret)
 			return (NULL);
 	}
 	replace_by_env_var(list, *env, ret);
+	replace_tilde(list, *env);
 	return (list);
 }
