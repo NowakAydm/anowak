@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/11 18:06:46 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/21 19:30:14 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/21 20:11:27 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,9 @@ char	**get_history(char **history)
 
 void	history_update_pos(int *pos, char **line)
 {
-	int x = 0;
+	int x;
 
+	x = 0;
 	while (x <= (int)ft_strlen(*line))
 	{
 		pos[0]++;

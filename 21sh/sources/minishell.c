@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 17:10:08 by anowak            #+#    #+#             */
-/*   Updated: 2015/12/10 18:46:25 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/21 20:10:51 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-char	*get_in_env(char **envp, char *var)
+char		*get_in_env(char **envp, char *var)
 {
 	int		x;
 
@@ -24,7 +24,7 @@ char	*get_in_env(char **envp, char *var)
 	return (ft_strchr(envp[x], '=') + 1);
 }
 
-char	**extract_path_directories(char **envp)
+char		**extract_path_directories(char **envp)
 {
 	int		x;
 
@@ -36,7 +36,7 @@ char	**extract_path_directories(char **envp)
 	return (ft_strsplit((ft_strchr(envp[x], '=') + 1), ':'));
 }
 
-void	increment_shlvl(char ***env)
+void		increment_shlvl(char ***env)
 {
 	int		n;
 	char	**str;
@@ -54,7 +54,7 @@ void	increment_shlvl(char ***env)
 	}
 }
 
-t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
+t_ftsh		*intialize_sh(int argc, char **argv, char **envp)
 {
 	t_ftsh	*sh;
 
@@ -81,7 +81,7 @@ t_ftsh	*intialize_sh(int argc, char **argv, char **envp)
 	return (sh);
 }
 
-int	write_prompt(char **prompt)
+int			write_prompt(char **prompt)
 {
 	static char *str;
 
@@ -93,7 +93,22 @@ int	write_prompt(char **prompt)
 	return (ft_strlen(str));
 }
 
-int		main(int argc, char **argv, char **envp)
+void		command_line_loop(t_ftsh *sh)
+{
+	if ((sh->line = get_command_line()) != NULL)
+	{
+		sh->ret = execute_command_line(sh, &(sh->env_dup));
+		ft_tabfree(sh->path_dir);
+		sh->path_dir = extract_path_directories(sh->env_dup);
+	}
+	else
+	{
+		restore_term(NULL);
+		exit(1);
+	}
+}
+
+int			main(int argc, char **argv, char **envp)
 {
 	t_ftsh	*sh;
 
@@ -106,22 +121,11 @@ int		main(int argc, char **argv, char **envp)
 	}
 	while (1)
 	{
-// TODO : Expand tilde
 		catch_signals();
 		if (sh->line)
 			free(sh->line);
 		sh->line = NULL;
 		write_prompt(&(sh->prompt));
-		if ((sh->line = get_command_line()) != NULL)
-		{
-			sh->ret = execute_command_line(sh, &(sh->env_dup));
-			ft_tabfree(sh->path_dir);
-			sh->path_dir = extract_path_directories(sh->env_dup);
-		}
-		else
-		{
-			restore_term(NULL);
-			exit(1);
-		}
+		command_line_loop(sh);
 	}
 }
