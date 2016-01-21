@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/13 16:43:45 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/21 18:23:56 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/19 16:12:52 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,11 @@ char	*get_command_line(void)
 		if (!line)
 			return (NULL);
 		if (ret == -1)
+		{
+			if (tmp)
+				free(tmp);
 			return (NULL);
+		}
 		line = recover_previous_line(&line, &tmp);
 		if (line)
 		{

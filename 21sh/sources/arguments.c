@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/19 14:56:52 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/21 18:19:46 by AdamNowak        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,10 +112,12 @@ void	replace_by_env_var(t_list *list, char **env, int ret)
 void	replace_tilde(t_list *list, char **env)
 {
 	t_list	*tmp;
-	char	*str = NULL;
-	char	*home = NULL;
+	char	*str;
+	char	*home;
 	int		x;
 
+	str = NULL;
+	home = NULL;
 	tmp = list;
 	while (tmp)
 	{
@@ -124,7 +126,7 @@ void	replace_tilde(t_list *list, char **env)
 			str = ft_strdup(tmp->content);
 			*str = *home;
 			x = 0;
-			while (++x < (int) ft_strlen(home))
+			while (++x < (int)ft_strlen(home))
 				str = ft_strinsert(str, *(home + x), x);
 			free(tmp->content);
 			tmp->content = str;
