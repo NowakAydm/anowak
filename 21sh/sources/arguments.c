@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/07/14 20:13:16 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/21 18:19:46 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/22 18:56:14 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,27 +61,6 @@ int		argument_not_in_quotes(char *line, t_list **list, int x)
 	else if (arg_is_fd_redirector(line + x))
 		y += 4;
 	return (add_argument_to_list(line, list, x, y));
-}
-
-char	*remove_char(char *str, char c)
-{
-	char	*new;
-	char	*spot;
-
-	if (ft_strchr(str + 1, c))
-	{
-		new = ft_strdup(str + 1);
-		while ((spot = ft_strchr(new, c)))
-		{
-			*spot = '\0';
-			ft_strcat(new, spot + 1);
-			spot = NULL;
-		}
-		spot = ft_strdup(new);
-		free(new);
-		return (spot);
-	}
-	return (str);
 }
 
 void	replace_by_env_var(t_list *list, char **env, int ret)

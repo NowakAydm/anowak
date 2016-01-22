@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/08 16:18:54 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/14 18:45:43 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/22 21:05:09 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int ft_strncmp(const char *s1, const char *s2, size_t n)
+int		ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	unsigned int		x;
 	char				*str1;

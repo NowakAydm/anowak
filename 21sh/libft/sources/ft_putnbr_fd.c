@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/14 19:23:06 by anowak            #+#    #+#             */
-/*   Updated: 2014/11/14 20:03:27 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/22 21:03:37 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void ft_putnbr_fd(int nb, int fd)
+void	ft_putnbr_fd(int nb, int fd)
 {
 	char *str;
 

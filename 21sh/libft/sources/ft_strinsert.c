@@ -6,13 +6,13 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/11/12 19:12:34 by anowak            #+#    #+#             */
-/*   Updated: 2015/11/19 16:41:29 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/22 21:04:24 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char *ft_strinsert(char *str, char c, int n)
+char	*ft_strinsert(char *str, char c, int n)
 {
 	char *new;
 	char *end;

@@ -6,11 +6,50 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/29 19:00:08 by anowak            #+#    #+#             */
-/*   Updated: 2015/10/29 19:01:15 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/22 20:12:41 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
+
+void	increment_shlvl(char ***env)
+{
+	int		n;
+	char	**str;
+
+	if (get_in_env(*env, "SHLVL"))
+	{
+		n = ft_atoi(get_in_env(*env, "SHLVL"));
+		str = ft_memalloc(sizeof(char*) * 3);
+		str[0] = ft_strdup("setenv");
+		str[1] = ft_strnew(20);
+		str[1] = ft_strcat(str[1], "SHLVL=");
+		str[1] = ft_strcat(str[1], ft_itoa(++n));
+		builtin_setenv(str, env);
+		ft_tabfree(str);
+	}
+}
+
+char	*remove_char(char *str, char c)
+{
+	char	*new;
+	char	*spot;
+
+	if (ft_strchr(str + 1, c))
+	{
+		new = ft_strdup(str + 1);
+		while ((spot = ft_strchr(new, c)))
+		{
+			*spot = '\0';
+			ft_strcat(new, spot + 1);
+			spot = NULL;
+		}
+		spot = ft_strdup(new);
+		free(new);
+		return (spot);
+	}
+	return (str);
+}
 
 int		pipe_the_child(t_cmd *cmd, t_ftsh *sh, char ***env_dup, int *pipe_des)
 {
