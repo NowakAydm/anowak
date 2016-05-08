@@ -1,33 +1,14 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdelchar.c                                    :+:      :+:    :+:   */
+/*   move_cursor.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/11/12 18:45:42 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/22 21:04:13 by anowak           ###   ########.fr       */
+/*   Created: 2016/01/22 20:35:08 by anowak            #+#    #+#             */
+/*   Updated: 2016/01/22 20:35:21 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "ft_minishell.h"
 
-char	*ft_strdelchar(char *str, int n)
-{
-	char *new;
-	char *end;
-
-	new = NULL;
-	if (str)
-		if (n < (int)ft_strlen(str))
-		{
-			if (!(new = ft_strnew(ft_strlen(str))))
-				return (NULL);
-			end = ft_strdup(str + n + 1);
-			ft_strncpy(new, str, n);
-			ft_strcat(new, end);
-			free(end);
-			free(str);
-		}
-	return (new);
-}

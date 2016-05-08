@@ -6,50 +6,11 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/01/11 18:06:46 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/21 20:11:27 by AdamNowak        ###   ########.fr       */
+/*   Updated: 2016/01/22 20:12:12 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	write_command_to_history(char *str, int fd)
-{
-	int		x;
-
-	x = 0;
-	while (str[x])
-	{
-		if (str[x] == '\n')
-			write(fd, "\\", 1);
-		write(fd, str + x, 1);
-		x++;
-	}
-	write(fd, "\n", 1);
-}
-
-void	write_to_history(char *str)
-{
-	int		fd;
-	char	*path;
-
-	if (str && ft_strlen(str))
-	{
-		path = ft_strnew(ft_strlen(getenv("HOME")) + 15);
-		ft_strcat(path, getenv("HOME"));
-		ft_strcat(path, "/.zshrc_history");
-		if ((fd = open(path, O_WRONLY | O_CREAT | O_APPEND, 0644)) == -1)
-			ft_putendl_fd("Error: Open failed", 2);
-		else
-		{
-			ft_putstr_fd(": ", fd);
-			ft_putnbr_fd(time(NULL), fd);
-			ft_putstr_fd(":0;", fd);
-			write_command_to_history(str, fd);
-			close(fd);
-		}
-		free(path);
-	}
-}
 
 char	**get_history(char **history)
 {

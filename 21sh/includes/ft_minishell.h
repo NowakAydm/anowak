@@ -6,7 +6,7 @@
 /*   By: anowak <anowak@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/05/19 14:41:22 by anowak            #+#    #+#             */
-/*   Updated: 2016/01/19 16:12:17 by anowak           ###   ########.fr       */
+/*   Updated: 2016/01/22 21:02:49 by anowak           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,10 @@
 # include <term.h>
 # undef tab
 
-
 # define PROMPT "$> "
 # define PROMPTLEN 3
 
-typedef struct stat     t_stat;
+typedef struct stat		t_stat;
 
 /*
 **\ -------     minishell.c    --------
@@ -44,7 +43,7 @@ typedef struct stat     t_stat;
 char	*get_in_env(char **envp, char *var);
 char	**extract_path_directories(char **envp);
 t_ftsh	*initialize_sh(int argc, char **argv, char **envp);
-int		write_prompt(char **prompt);
+void	command_line_loop(t_ftsh *sh);
 
 /*
 ** -------       signals.c      --------
@@ -58,6 +57,8 @@ void	catch_signals(void);
 /*
 ** -------        pipe.c        --------
 */
+void	increment_shlvl(char ***env);
+char	*remove_char(char *str, char c);
 int		pipe_the_child(t_cmd *cmd, t_ftsh *sh, char ***env_dup, int *pipe_des);
 void	pipe_the_parent(t_cmd *cmd, char ***env_dup, int *pipe_des);
 int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup);
@@ -67,6 +68,9 @@ int		pipe_it_up(t_cmd *cmd, t_ftsh *sh, char ***env_dup);
 */
 void	print_input_redirection_error(t_cmd *cmd);
 void	print_ret_message(int status, char *cmd);
+int		write_prompt(char **prompt);
+void	write_command_to_history(char *str, int fd);
+void	write_to_history(char *str);
 
 /*
 ** -------       dup_fd.c       --------
@@ -109,8 +113,8 @@ int		arg_is_fd_redirector(char *arg);
 */
 int		add_argument_to_list(char *line, t_list **list, int x, int y);
 int		argument_not_in_quotes(char *line, t_list **list, int x);
-char	*remove_char(char *str, char c);
 void	replace_by_env_var(t_list *list, char **env, int ret);
+void	replace_tilde(t_list *list, char **env);
 t_list	*split_into_args(char *line, char ***env, int ret);
 
 /*
@@ -133,36 +137,73 @@ int		find_path_to_command(t_cmd *new, char **path_dir);
 /*
 ** -------      history.c     --------
 */
-void	write_to_history(char *str);
 char	**get_history(char **history);
-void	replace_line_with_history(int *pos, char **line, char **history, int index);
+void	history_update_pos(int *pos, char **line);
+void	replace_line_with_history(int *pos, char **line, char **h, int index);
 void	navigate_through_history(char *key, int *pos, char **line);
+
+/*
+** -------   process_key.c  --------
+*/
+void	process_left_arrow_on_begl(int *pos);
+void	process_left_arrow(int *pos, char **line);
+void	process_right_arrow(int *pos, char **line);
+void	process_alt_arrow(char *key, int *pos, char **line);
+int		process_special_key(char *key, int *pos, char **line);
+
+/*
+** -------  move_cursor.c  --------
+*/
+void	go_up_aline(int *pos, char **line);
+void	go_down_aline(int *pos, char **line);
+void	go_to_endl(int *pos, char **line);
+void	go_to_begl(int *pos, char **line);
+
+/*
+** -------   insert_char.c  --------
+*/
+int		process_copypaste(char *key, int *pos, char **line);
+void	delete_char_up_aline(int *pos, char **line);
+int		delete_char(int *pos, char **line);
+void	insert_key(char *key, char **line, int *pos);
+
+/*
+** -------   read_line.c  --------
+*/
+int		read_next_char(char **line, int *pos);
+void	clear_line(char **line);
+int		read_next_line(char **line);
+int		ft_outc(int c);
+int		process_enter(char *key, char **line, int *pos);
+
+/*
+** -------   move_word.c   --------
+*/
+void	go_to_prevword(int *pos, char **line);
+void	go_to_nextword(int *pos, char **line);
 
 /*
 ** -------      term.c     --------
 */
-void	clear_line(char **line);
-void	go_to_endl(int *pos, char **line);
-void	go_to_begl(int *pos, char **line);
 void	restore_term(struct termios *term);
 int		initialize_term(t_ftsh *sh, char **envp);
-int		read_next_char(char **line, int *pos);
-int		read_next_line(char **line);
-int		ft_outc(int c);
-void	insert_key(char *key, char **line, int *pos);
+int		term_line_len(int n, char **line);
+int		term_line_index(int *pos, char **line);
 int		process_key(char *key, char **line, int *pos);
 
 /*
 ** -------      builtins.c     --------
 */
+int		execute_builtin(t_cmd *cmd, char ***envp);
+int		check_builtin(t_cmd *cmd);
+
 int		change_env_pwd(char ***envp);
 int		check_if_in_env(char *av, char **env);
+
 int		builtin_exit(int ac, char **av);
 int		builtin_cd(char **av, char ***envp);
 int		builtin_setenv(char **av, char ***env);
 int		builtin_unsetenv(char **av, char ***env);
 int		builtin_env(char **env);
-int		execute_builtin(t_cmd *cmd, char ***envp);
-int		check_builtin(t_cmd *cmd);
 
 #endif
