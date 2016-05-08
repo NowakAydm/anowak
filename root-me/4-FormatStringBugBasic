@@ -1,0 +1,5 @@
+On se sert de la format string avec %s pour afficher la string a l'adresse mémoire stockée sur la stack. Cela se termine souvent en segfault, mais en ajoutant des %x, on shifte le pointeur sur l'adresse mémoire suivante.
+
+En y allant petit à petit, on tombe sur l'adresse mémoire du mot de passe, reconaissable par sa lisibilité.
+
+./ch5 "%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X%X  ||   %s"
