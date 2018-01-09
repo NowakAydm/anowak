@@ -20,10 +20,6 @@ export MAIL
 alias l="ls -laGh"
 alias e="emacs"
 alias r="rm -v *~; rm -v */*~ ; rm -v .*~ ; rm -v */.*~"
-alias gs="git status"
-alias gaa="git add -A"
-alias gc="git commit -m"
-alias gp="git push"
 alias synchronize="~/projects/SynchronizeGit.sh"
 
 eval "$(thefuck --alias)"
