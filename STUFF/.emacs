@@ -6,7 +6,7 @@
 ;    by: thor <thor@42.fr>                           +#+  +:+       +#+         ;
 ;                                                  +#+#+#+#+#+   +#+            ;
 ;    Created: 2013/06/18 14:01:14 by thor               #+#    #+#              ;
-;    Updated: 2016/01/21 19:51:33 by AdamNowak        ###   ########.fr        ;
+;    Updated: 2018/01/10 17:55:31 by anowak           ###   ########.fr        ;
 ;                                                                               ;
 ;*******************************************************************************;
 
@@ -19,12 +19,12 @@
 (load "comments.el")
 (load "header.el")
 
-(setq config_files "/nfs/zfs-student-4/users/anowak/.emacs.d/lisp/")
+(setq config_files "~/.emacs.d/lisp/")
 (setq load-path (append (list nil config_files) load-path))
-;(load "highlight-chars.el")
-;(load "template.el")
+(load "highlight-chars.el")
+(load "template.el")
 
-;(custom-set-variables '(template-use-package t nil (template)))
+(custom-set-variables '(template-use-package t nil (template)))
 
 ; Set default emacs configuration
 (set-language-environment "UTF-8")
@@ -106,10 +106,10 @@
 (show-paren-mode 1)
 
 ;; highlight stuff
-;(require 'highlight-chars)
-;(global-hi-lock-mode 1)
-;(add-hook 'change-major-mode-hook
-;		  '(lambda ()
-;			(add-hook 'font-lock-mode-hook 'hc-highlight-trailing-whitespace)
-;;			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-hyphens)
-;			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-spaces)))
+(require 'highlight-chars)
+(global-hi-lock-mode 1)
+(add-hook 'change-major-mode-hook
+		  '(lambda ()
+			(add-hook 'font-lock-mode-hook 'hc-highlight-trailing-whitespace)
+;			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-hyphens)
+			(add-hook 'font-lock-mode-hook 'hc-highlight-hard-spaces)))
